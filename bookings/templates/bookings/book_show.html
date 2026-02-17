@@ -1,17 +1,58 @@
-<h1>Select Seats</h1>
+{% extends "base.html" %}
 
-{% if error %}
-    <p style="color:red;">{{ error }}</p>
-{% endif %}
+{% block title %}Select Seats{% endblock %}
 
-<form method="POST">
-    {% csrf_token %}
+{% block content %}
+<h2 class="text-center mb-4">Select Your Seats</h2>
 
-    {% for seat in seats %}
-        <input type="checkbox" name="seats" value="{{ seat.id }}">
-        {{ seat.row }}{{ seat.seat_number }}
-        <br>
-    {% endfor %}
+<div class="d-flex justify-content-center">
+    <div class="seat-grid">
+        {% for row in seats %}
+        <div class="d-flex justify-content-center mb-2">
+            {% for seat in row %}
+            <div class="seat
+                {% if seat.is_booked %}
+                    seat-booked
+                {% else %}
+                    seat-available
+                {% endif %}
+            ">
+                {{ seat.number }}
+            </div>
+            {% endfor %}
+        </div>
+        {% endfor %}
+    </div>
+</div>
 
-    <button type="submit">Confirm Booking</button>
-</form>
+<div class="text-center mt-4">
+    <button class="btn btn-success px-4" disabled>
+        Confirm Booking
+    </button>
+</div>
+
+<style>
+.seat {
+    width: 40px;
+    height: 40px;
+    margin: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 6px;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+.seat-available {
+    background-color: #e9ecef;
+    border: 1px solid #adb5bd;
+}
+
+.seat-booked {
+    background-color: #dc3545;
+    color: white;
+    cursor: not-allowed;
+}
+</style>
+{% endblock %}
