@@ -1,8 +1,28 @@
-<h1>{{ movie.title }}</h1>
+{% extends "base.html" %}
 
-{% for show in shows %}
-    <a href="{% url 'book_show' show.id %}">
-        Book Show - {{ show.show_date }} {{ show.show_time }}
-    </a>
-    <br>
-{% endfor %}
+{% block title %}{{ movie.title }}{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-4">
+        {% if movie.poster %}
+        <img src="{{ movie.poster.url }}" class="img-fluid rounded shadow" alt="{{ movie.title }}">
+        {% else %}
+        <div class="bg-secondary text-white text-center py-5 rounded">
+            No Image Available
+        </div>
+        {% endif %}
+    </div>
+
+    <div class="col-md-8">
+        <h2>{{ movie.title }}</h2>
+        <p class="text-muted mt-3">
+            {{ movie.description }}
+        </p>
+
+        <a href="#" class="btn btn-success mt-4">
+            Book Seats
+        </a>
+    </div>
+</div>
+{% endblock %}
