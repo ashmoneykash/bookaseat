@@ -32,6 +32,9 @@ class Booking(models.Model):
         on_delete=models.CASCADE,
         related_name='bookings'
     )
+
+    seats = models.ManyToManyField('Seat', related_name='seat_bookings')
+    
     status = models.CharField(
         max_length=10,
         choices=STATUS_CHOICES,
