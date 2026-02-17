@@ -1,0 +1,8 @@
+<h1>{{ movie.title }}</h1>
+
+{% for show in shows %}
+    <a href="{% url 'book_show' show.id %}">
+        Book Show - {{ show.show_date }} {{ show.show_time }}
+    </a>
+    <br>
+{% endfor %}

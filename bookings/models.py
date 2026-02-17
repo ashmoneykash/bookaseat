@@ -10,6 +10,9 @@ class Seat(models.Model):
     )
     seat_number = models.CharField(max_length=5)
     row = models.CharField(max_length=1)
+    
+    class Meta:
+        unique_together = ('show','row','seat_number')
 
     def __str__(self):
         return f"{self.row}{self.seat_number} - {self.show}"
@@ -32,6 +35,9 @@ class Booking(models.Model):
         on_delete=models.CASCADE,
         related_name='bookings'
     )
+
+    seats = models.ManyToManyField('Seat', related_name='seat_bookings')
+
     status = models.CharField(
         max_length=10,
         choices=STATUS_CHOICES,

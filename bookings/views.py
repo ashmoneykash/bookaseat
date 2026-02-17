@@ -1,3 +1,60 @@
-from django.shortcuts import render
+from django.db import transaction
+from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib.auth.decorators import login_required
+from movies.models import Show
+from .models import Seat, Booking
 
-# Create your views here.
+@login_required
+def book_show(request, show_id):
+    show = get_object_or_404(Show, id=show_id)
+    seats = show.seats.all()
+
+    if request.method == 'POST':
+        print(request.POST)
+
+        selected_seat_ids = request.POST.getlist('seats')
+
+        if not selected_seat_ids:
+            return render(request, 'bookings/book_show.html', {
+                'show': show,
+                'seats': seats,
+                'error': 'Please select at least one seat.'
+            })
+
+        with transaction.atomic():
+
+            # Check if any seat is already booked
+            already_booked = Seat.objects.filter(
+                id__in=selected_seat_ids,
+                seat_bookings__status='CONFIRMED'
+            ).exists()
+
+            if already_booked:
+                return render(request, 'bookings/book_show.html', {
+                    'show': show,
+                    'seats': seats,
+                    'error': 'One or more selected seats are already booked.'
+                })
+
+            booking = Booking.objects.create(
+                user=request.user,
+                show=show,
+                status='PENDING'
+            )
+
+            for seat_id in selected_seat_ids:
+                seat = Seat.objects.get(id=seat_id)
+                booking.seats.add(seat)
+
+            booking.status = 'CONFIRMED'
+            booking.save()
+
+            show.available_seats -= len(selected_seat_ids)
+            show.save()
+
+        return redirect('payment_success', booking_id=booking.id)
+
+    return render(request, 'bookings/book_show.html', {
+        'show': show,
+        'seats': seats
+    })
