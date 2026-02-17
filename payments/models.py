@@ -1,16 +1,6 @@
 from django.db import models
-
+from bookings.models import Booking
 # Create your models here.
-
-class Booking(models.Model):
-    movie_name = models.CharField(max_length=100)
-    seats = models.IntegerField()
-    amount = models.IntegerField()
-    paid = models.BooleanField(default=False)
-
-    def __str__(self):
-        return self.movie_name
-
 
 class Payment(models.Model):
     booking = models.OneToOneField(
@@ -27,4 +17,4 @@ class Payment(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f"Payment for {self.booking.movie_name}"
+        return f"Payment for Booking #{self.booking.id}"
