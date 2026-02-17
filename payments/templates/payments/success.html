@@ -1,4 +1,22 @@
-<h1>Booking Confirmed!</h1>
+{% extends "base.html" %}
 
-<p>Booking ID: {{ booking.id }}</p>
-<p>Status: {{ booking.status }}</p>
+{% block title %}Payment Successful{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-center align-items-center" style="min-height: 70vh;">
+    <div class="card shadow text-center p-5" style="max-width: 450px;">
+        <div class="mb-4">
+            <span class="display-1 text-success">✓</span>
+        </div>
+
+        <h3 class="mb-3">Payment Successful</h3>
+        <p class="text-muted mb-4">
+            Your booking has been confirmed successfully.
+        </p>
+
+        <a href="/movies/" class="btn btn-primary px-4">
+            Back to Movies
+        </a>
+    </div>
+</div>
+{% endblock %}
