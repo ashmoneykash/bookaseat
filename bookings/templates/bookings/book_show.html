@@ -1,0 +1,17 @@
+<h1>Select Seats</h1>
+
+{% if error %}
+    <p style="color:red;">{{ error }}</p>
+{% endif %}
+
+<form method="POST">
+    {% csrf_token %}
+
+    {% for seat in seats %}
+        <input type="checkbox" name="seats" value="{{ seat.id }}">
+        {{ seat.row }}{{ seat.seat_number }}
+        <br>
+    {% endfor %}
+
+    <button type="submit">Confirm Booking</button>
+</form>
