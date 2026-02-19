@@ -30,12 +30,21 @@
 
         {% if user.is_authenticated %}
           {% if user.is_staff %}
+            <!-- Admin: show Admin link, no username (redundant) -->
             <li class="nav-item">
               <a class="nav-link-bms nav-link" href="{% url 'dashboard_home' %}" style="color:#fbbf24 !important;">
                 <i class="bi bi-speedometer2 me-1"></i>Admin
               </a>
             </li>
+          {% else %}
+            <!-- Normal user: show profile icon with username -->
+            <li class="nav-item">
+              <a class="nav-link-bms nav-link" href="#" style="color:var(--bms-text);">
+                <i class="bi bi-person-circle me-1"></i>{{ user.username }}
+              </a>
+            </li>
           {% endif %}
+
           <li class="nav-item">
             <form method="post" action="{% url 'logout' %}" style="display:inline;">
               {% csrf_token %}
@@ -44,6 +53,7 @@
               </button>
             </form>
           </li>
+
         {% else %}
           <li class="nav-item">
             <a class="nav-link-bms nav-link" href="{% url 'register' %}">
@@ -56,6 +66,7 @@
             </a>
           </li>
         {% endif %}
+
       </ul>
     </div>
   </div>
