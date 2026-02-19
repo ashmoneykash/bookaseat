@@ -86,7 +86,7 @@
 
     /* Page wrapper */
     .page-wrapper {
-      padding: 2rem 0 4rem;
+      padding: 3rem 0 5rem;
     }
 
     /* Section heading */
@@ -187,11 +187,11 @@
 
   {% block extra_css %}{% endblock %}
 </head>
-<body>
+<body class="d-flex flex-column min-vh-100">
 
   {% include 'partials/navbar.html' %}
 
-  <main class="page-wrapper">
+  <main class="page-wrapper flex-grow-1">
     <div class="container">
       {% if messages %}
         {% for message in messages %}
@@ -206,7 +206,7 @@
     </div>
   </main>
 
-  <footer>
+  <footer class="mt-auto">
     <p class="mb-0">© 2024 <a href="{% url 'movie_list' %}">BookASeat</a> — Your Cinema Companion</p>
   </footer>
 

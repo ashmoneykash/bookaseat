@@ -1,194 +1,162 @@
-{% extends 'base.html' %}
-
-{% block title %}My Bookings — BookASeat{% endblock %}
+{% extends "base.html" %}
 
 {% block extra_css %}
 <style>
-  .booking-card {
-    background: var(--bms-card-bg);
-    border: 1px solid var(--bms-border);
-    border-radius: 12px;
-    overflow: hidden;
-    transition: box-shadow 0.2s ease;
-    margin-bottom: 1.25rem;
-  }
+/* === My Bookings Table Styling === */
 
-  .booking-card:hover {
-    box-shadow: 0 6px 30px rgba(248,68,100,0.15);
-    border-color: rgba(248,68,100,0.3);
-  }
+.table-card {
+    margin-top: 20px;
+    background: rgba(255, 255, 255, 0.02);
+    border-radius: 14px;
+    padding: 8px 0;
+}
 
-  .booking-card-body {
-    padding: 1.25rem 1.5rem;
-    display: flex;
-    align-items: center;
-    gap: 1.5rem;
-    flex-wrap: wrap;
-  }
+.booking-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+}
 
-  .booking-icon {
-    width: 56px;
-    height: 56px;
-    border-radius: 12px;
-    background: rgba(248,68,100,0.12);
-    border: 1px solid rgba(248,68,100,0.25);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1.4rem;
-    color: var(--bms-red);
-    flex-shrink: 0;
-  }
+.booking-table thead th {
+    padding: 16px 24px;
+    font-size: 12px;
+    letter-spacing: 0.08em;
+    color: #8b8fa3;
+    text-align: left;
+}
 
-  .booking-info { flex: 1; min-width: 200px; }
+.booking-table tbody td {
+    padding: 22px 24px;
+    border-top: 1px solid rgba(255,255,255,0.06);
+    vertical-align: middle;
+}
 
-  .booking-movie-name {
-    font-weight: 700;
-    font-size: 1.05rem;
-    color: #fff;
-    margin-bottom: 0.3rem;
-  }
-
-  .booking-details {
-    font-size: 0.82rem;
-    color: var(--bms-muted);
-  }
-
-  .booking-details span { margin-right: 0.9rem; }
-
-  .booking-seats {
-    font-size: 0.8rem;
-    color: var(--bms-red);
+.title-cell {
     font-weight: 600;
-    margin-top: 0.3rem;
-  }
+    font-size: 15px;
+}
 
-  .seat-tag {
-    display: inline-block;
-    background: rgba(248,68,100,0.1);
-    border: 1px solid rgba(248,68,100,0.25);
-    color: var(--bms-red);
-    border-radius: 4px;
-    padding: 0.1rem 0.5rem;
-    font-size: 0.75rem;
-    font-weight: 700;
-    margin: 0.1rem;
-  }
-
-  .status-badge {
-    padding: 0.3rem 0.85rem;
-    border-radius: 20px;
-    font-size: 0.75rem;
-    font-weight: 700;
-    letter-spacing: 0.5px;
-    text-transform: uppercase;
-    white-space: nowrap;
-  }
-
-  .status-CONFIRMED {
-    background: rgba(34,197,94,0.12);
-    color: #4ade80;
-    border: 1px solid rgba(34,197,94,0.3);
-  }
-
-  .status-PENDING {
-    background: rgba(251,191,36,0.12);
-    color: #fbbf24;
-    border: 1px solid rgba(251,191,36,0.3);
-  }
-
-  .status-CANCELLED {
-    background: rgba(248,68,100,0.12);
-    color: var(--bms-red);
-    border: 1px solid rgba(248,68,100,0.3);
-  }
-
-  .booking-ref {
-    font-size: 0.72rem;
-    color: var(--bms-muted);
-    margin-top: 0.25rem;
-    text-align: center;
-  }
-
-  .empty-state {
-    text-align: center;
-    padding: 5rem 0;
-  }
-
-  .empty-state i {
-    font-size: 5rem;
-    color: rgba(248,68,100,0.2);
+.title-cell span {
     display: block;
-    margin-bottom: 1.5rem;
-  }
+    font-size: 12px;
+    color: #9aa0b5;
+    margin-top: 4px;
+}
 
-  .empty-state p {
-    color: var(--bms-muted);
-    font-size: 1rem;
-    margin-bottom: 1.5rem;
-  }
+.status-pill {
+    padding: 6px 16px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 600;
+    display: inline-block;
+}
+
+.status-pill.confirmed {
+    background: rgba(0, 200, 100, 0.15);
+    color: #3ddc84;
+}
+
+/* Section headings */
+.section-title {
+    margin-top: 60px;   /* space between sections */
+    margin-bottom: 24px;
+    font-size: 26px;
+    font-weight: 600;
+}
+
+.section-title.red {
+    color: var(--bms-red); /* BookASeat red */
+}
 </style>
 {% endblock %}
 
+
 {% block content %}
-<div class="section-heading">MY BOOKINGS</div>
-<div class="section-divider"></div>
+<div class="container my-bookings-page">
 
-{% if bookings %}
-  <p style="color:var(--bms-muted); font-size:0.88rem; margin-bottom:1.5rem;">
-    <i class="bi bi-ticket-perforated me-1"></i>{{ bookings|length }} booking{{ bookings|length|pluralize }} found
-  </p>
+    <h1 class="page-title">My Bookings</h1>
 
-  {% for booking in bookings %}
-    <div class="booking-card">
-      <div class="booking-card-body">
+    <!-- ================= Movie Bookings ================= -->
+    {% if movie_bookings %}
+    <h2 class="section-title red">Movie Bookings</h2>
 
-        <div class="booking-icon">
-          <i class="bi bi-ticket-perforated-fill"></i>
-        </div>
-
-        <div class="booking-info">
-          <div class="booking-movie-name">{{ booking.show.movie.title }}</div>
-          <div class="booking-details">
-            <span><i class="bi bi-calendar3 me-1"></i>{{ booking.show.show_date }}</span>
-            <span><i class="bi bi-clock me-1"></i>{{ booking.show.show_time }}</span>
-            <span><i class="bi bi-geo-alt me-1"></i>{{ booking.show.theatre.name }}</span>
-          </div>
-          {% if booking.seats.all %}
-            <div class="booking-seats mt-1">
-              <i class="bi bi-grid me-1"></i>
-              {% for seat in booking.seats.all %}
-                <span class="seat-tag">{{ seat.row }}{{ seat.seat_number }}</span>
-              {% endfor %}
-            </div>
-          {% endif %}
-        </div>
-
-        <div class="text-center">
-          <span class="status-badge status-{{ booking.status }}">
-            {% if booking.status == 'CONFIRMED' %}
-              <i class="bi bi-check-circle me-1"></i>
-            {% elif booking.status == 'CANCELLED' %}
-              <i class="bi bi-x-circle me-1"></i>
-            {% else %}
-              <i class="bi bi-hourglass-split me-1"></i>
-            {% endif %}
-            {{ booking.status }}
-          </span>
-          <div class="booking-ref">Ref #{{ booking.id }}</div>
-        </div>
-
-      </div>
+    <div class="table-card">
+        <table class="booking-table">
+            <thead>
+                <tr>
+                    <th style="width:35%">TITLE</th>
+                    <th style="width:15%">LANGUAGE</th>
+                    <th style="width:15%">SEATS</th>
+                    <th style="width:20%">DATE</th>
+                    <th style="width:15%">STATUS</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for booking in movie_bookings %}
+                <tr>
+                    <td>
+                        <div class="title-cell">
+                            {{ booking.show.movie.title }}
+                            <span>{{ booking.show.theatre.name }}</span>
+                        </div>
+                    </td>
+                    <td>{{ booking.show.movie.language }}</td>
+                    <td>
+                        {% for seat in booking.seats.all %}
+                            {{ seat.row }}{{ seat.seat_number }}
+                        {% endfor %}
+                    </td>
+                    <td>{{ booking.show.date }}</td>
+                    <td>
+                        <span class="status-pill confirmed">
+                            {{ booking.status }}
+                        </span>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
     </div>
-  {% endfor %}
+    {% endif %}
 
-{% else %}
-  <div class="empty-state">
-    <i class="bi bi-ticket-perforated"></i>
-    <p>You haven't made any bookings yet.</p>
-    <a href="{% url 'movie_list' %}" class="btn btn-bms-primary px-4">
-      <i class="bi bi-film me-2"></i>Browse Movies
-    </a>
-  </div>
-{% endif %}
+    <!-- ================= Event Bookings ================= -->
+    {% if event_bookings %}
+    <h2 class="section-title red">Event Bookings</h2>
+
+    <div class="table-card">
+        <table class="booking-table">
+            <thead>
+                <tr>
+                    <th style="width:35%">TITLE</th>
+                    <th style="width:20%">TYPE</th>
+                    <th style="width:15%">TICKETS</th>
+                    <th style="width:20%">DATE</th>
+                    <th style="width:10%">STATUS</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for booking in event_bookings %}
+                <tr>
+                    <td>
+                        <div class="title-cell">
+                            {{ booking.event.title }}
+                            <span>{{ booking.event.venue.name }}</span>
+                        </div>
+                    </td>
+                    <td>{{ booking.event.get_event_type_display }}</td>
+                    <td>{{ booking.quantity }}</td>
+                    <td>{{ booking.event.event_date }}</td>
+                    <td>
+                        <span class="status-pill confirmed">
+                            {{ booking.status }}
+                        </span>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% endif %}
+
+</div>
 {% endblock %}
