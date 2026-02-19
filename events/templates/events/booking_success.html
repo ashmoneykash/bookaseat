@@ -1,0 +1,120 @@
+{% extends 'base.html' %}
+{% block title %}Booking Confirmed — {{ booking.event.title }}{% endblock %}
+
+{% block extra_css %}
+<style>
+  .success-wrapper {
+    max-width: 500px;
+    margin: 3rem auto;
+    text-align: center;
+  }
+
+  .success-icon {
+    width: 80px; height: 80px; border-radius: 50%;
+    background: rgba(74,222,128,0.12);
+    border: 2px solid #4ade80;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 2.2rem; margin: 0 auto 1.5rem;
+    animation: confirm-pulse 2s ease infinite;
+  }
+
+  @keyframes confirm-pulse {
+    0%,100% { box-shadow: 0 0 0 0 rgba(74,222,128,0.35); }
+    50%      { box-shadow: 0 0 0 16px rgba(74,222,128,0); }
+  }
+
+  .success-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 2rem; letter-spacing: 2px; color: #fff;
+    margin-bottom: 0.4rem;
+  }
+
+  .success-sub { color: var(--bms-muted); font-size: 0.9rem; margin-bottom: 2rem; }
+
+  .ticket-card {
+    background: var(--bms-card-bg);
+    border: 1px solid var(--bms-border);
+    border-radius: 16px;
+    padding: 1.5rem;
+    text-align: left;
+    margin-bottom: 1.5rem;
+  }
+
+  .ticket-header {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.1rem; letter-spacing: 1.5px;
+    color: #fff; margin-bottom: 1rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px dashed var(--bms-border);
+  }
+
+  .ticket-row {
+    display: flex; justify-content: space-between;
+    font-size: 0.88rem; padding: 0.35rem 0;
+    color: var(--bms-muted);
+    animation: fadeInUp 0.4s ease both;
+  }
+
+  .ticket-row:nth-child(1) { animation-delay: 0.1s; }
+  .ticket-row:nth-child(2) { animation-delay: 0.18s; }
+  .ticket-row:nth-child(3) { animation-delay: 0.26s; }
+  .ticket-row:nth-child(4) { animation-delay: 0.34s; }
+  .ticket-row:nth-child(5) { animation-delay: 0.42s; }
+
+  @keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(10px); }
+    to   { opacity: 1; transform: none; }
+  }
+
+  .ticket-row span:last-child { color: #fff; font-weight: 500; }
+
+  .ticket-total {
+    display: flex; justify-content: space-between;
+    font-size: 1rem; font-weight: 700;
+    border-top: 1px dashed var(--bms-border);
+    padding-top: 0.75rem; margin-top: 0.5rem;
+  }
+
+  .ticket-total span:last-child { color: #4ade80; font-size: 1.2rem; }
+
+  .booking-id {
+    font-size: 0.75rem; color: var(--bms-muted);
+    margin-bottom: 1.5rem;
+  }
+
+  .booking-id span { color: var(--bms-red); font-weight: 600; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="success-wrapper animate__animated animate__fadeInUp">
+
+  <div class="success-icon">🎉</div>
+  <div class="success-title">You're Booked!</div>
+  <p class="success-sub">Your tickets are confirmed. See you at the event!</p>
+  <div class="booking-id">Booking ID: <span>#{{ booking.id }}</span></div>
+
+  <div class="ticket-card">
+    <div class="ticket-header"><i class="bi bi-ticket-perforated me-2" style="color:var(--bms-red);"></i>YOUR TICKETS</div>
+    <div class="ticket-row"><span>Event</span><span>{{ booking.event.title }}</span></div>
+    <div class="ticket-row"><span>Date</span><span>{{ booking.event.event_date }}</span></div>
+    <div class="ticket-row"><span>Time</span><span>{{ booking.event.event_time }}</span></div>
+    {% if booking.event.venue %}
+      <div class="ticket-row"><span>Venue</span><span>{{ booking.event.venue.name }}, {{ booking.event.venue.city }}</span></div>
+    {% endif %}
+    <div class="ticket-row"><span>Tickets</span><span>{{ booking.quantity }}</span></div>
+    <div class="ticket-total">
+      <span>Total Paid</span>
+      <span>₹{{ booking.total_price }}</span>
+    </div>
+  </div>
+
+  <a href="{% url 'event_list' %}" class="btn btn-bms-primary w-100 py-2 mb-2">
+    <i class="bi bi-calendar-event me-2"></i>Browse More Events
+  </a>
+  <a href="{% url 'my_bookings' %}" class="btn btn-bms-outline w-100 py-2">
+    <i class="bi bi-receipt me-2"></i>My Bookings
+  </a>
+
+</div>
+{% endblock %}

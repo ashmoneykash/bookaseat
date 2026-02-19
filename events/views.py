@@ -1,5 +1,9 @@
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, get_object_or_404, redirect
+from django.contrib.auth.decorators import login_required
+from django.contrib import messages
+from django.db import transaction
 from .models import Event, EVENT_TYPE_CHOICES
+from bookings.models import EventBooking
 
 
 def event_list(request):
@@ -17,3 +21,59 @@ def event_list(request):
 def event_detail(request, event_id):
     event = get_object_or_404(Event, id=event_id, is_active=True)
     return render(request, 'events/event_detail.html', {'event': event})
+
+
+@login_required
+def book_event(request, event_id):
+    event = get_object_or_404(Event, id=event_id, is_active=True)
+
+    if request.method == 'POST':
+        try:
+            quantity = int(request.POST.get('quantity', 1))
+        except (ValueError, TypeError):
+            quantity = 1
+
+        # Validate quantity
+        if quantity < 1:
+            messages.error(request, 'Please select at least 1 ticket.')
+            return render(request, 'events/book_event.html', {'event': event})
+
+        if quantity > 10:
+            messages.error(request, 'You can book a maximum of 10 tickets at once.')
+            return render(request, 'events/book_event.html', {'event': event})
+
+        if quantity > event.available_seats:
+            messages.error(request, f'Only {event.available_seats} seat(s) available.')
+            return render(request, 'events/book_event.html', {'event': event})
+
+        with transaction.atomic():
+            # Re-check availability inside the transaction to prevent race conditions
+            event = Event.objects.select_for_update().get(id=event_id)
+
+            if quantity > event.available_seats:
+                messages.error(request, 'Sorry, seats were just taken. Please try again.')
+                return render(request, 'events/book_event.html', {'event': event})
+
+            total = event.price * quantity
+
+            booking = EventBooking.objects.create(
+                user=request.user,
+                event=event,
+                quantity=quantity,
+                total_price=total,
+                status='CONFIRMED',
+            )
+
+            event.available_seats -= quantity
+            event.save()
+
+        return redirect('event_booking_success', booking_id=booking.id)
+
+    # GET — show the quantity picker page
+    return render(request, 'events/book_event.html', {'event': event})
+
+
+@login_required
+def event_booking_success(request, booking_id):
+    booking = get_object_or_404(EventBooking, id=booking_id, user=request.user)
+    return render(request, 'events/booking_success.html', {'booking': booking})

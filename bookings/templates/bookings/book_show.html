@@ -32,7 +32,7 @@
 
   .booking-meta span { margin-right: 1rem; }
 
-  /* Screen */
+  /* ── Screen ── */
   .screen-wrapper {
     text-align: center;
     margin-bottom: 2.5rem;
@@ -45,7 +45,13 @@
     background: linear-gradient(to bottom, #ffffff88, transparent);
     border-radius: 50% 50% 0 0 / 8px 8px 0 0;
     margin: 0 auto 0.4rem;
-    box-shadow: 0 0 30px rgba(255,255,255,0.2);
+    /* ── ANIMATION: pulsing glow on the screen bar ── */
+    animation: screen-glow 3s ease-in-out infinite;
+  }
+
+  @keyframes screen-glow {
+    0%, 100% { box-shadow: 0 0 18px rgba(255, 255, 255, 0.15), 0 0 6px rgba(255,255,255,0.1); }
+    50%       { box-shadow: 0 0 40px rgba(255, 255, 255, 0.45), 0 0 80px rgba(248,68,100,0.15); }
   }
 
   .screen-label {
@@ -55,7 +61,7 @@
     color: var(--bms-muted);
   }
 
-  /* Seat grid */
+  /* ── Seat grid ── */
   .seats-container {
     max-width: 640px;
     margin: 0 auto 2.5rem;
@@ -86,7 +92,12 @@
     border: 1.5px solid #3a4a6a;
     background: #1e2a45;
     cursor: pointer;
-    transition: all 0.15s ease;
+    /* ── ANIMATION: smooth spring transition on all states ── */
+    transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1),
+                background 0.18s ease,
+                border-color 0.18s ease,
+                box-shadow 0.18s ease,
+                color 0.18s ease;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -94,13 +105,16 @@
     font-weight: 700;
     color: #8892a4;
     user-select: none;
+    position: relative;
   }
 
-  .seat:hover:not(.seat-booked) {
-    background: rgba(248,68,100,0.2);
+  /* ── ANIMATION: hover lift (available seats only) ── */
+  .seat:hover:not(.seat-booked):not(.seat-selected) {
+    background: rgba(248, 68, 100, 0.2);
     border-color: var(--bms-red);
     color: #fff;
-    transform: translateY(-2px);
+    transform: translateY(-4px) scale(1.12);
+    box-shadow: 0 6px 16px rgba(248, 68, 100, 0.25);
   }
 
   .seat-booked {
@@ -109,17 +123,38 @@
     cursor: not-allowed !important;
     opacity: 0.4;
     color: #5a3030 !important;
+    transform: none !important;
   }
 
+  /* ── ANIMATION: selected state with spring pop ── */
   .seat-selected {
     background: var(--bms-red) !important;
     border-color: var(--bms-red) !important;
     color: #fff !important;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(248,68,100,0.4);
+    box-shadow: 0 4px 18px rgba(248, 68, 100, 0.5);
+    transform: translateY(-2px) scale(1.05);
+    animation: seat-pop 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
   }
 
-  /* Legend */
+  /* ── ANIMATION: the spring-pop keyframe ── */
+  @keyframes seat-pop {
+    0%   { transform: scale(0.75) translateY(0); }
+    55%  { transform: scale(1.25) translateY(-4px); }
+    100% { transform: scale(1.05) translateY(-2px); }
+  }
+
+  /* ── ANIMATION: deselect shrink ── */
+  @keyframes seat-deselect {
+    0%   { transform: scale(1.05); }
+    40%  { transform: scale(0.9); }
+    100% { transform: scale(1) translateY(0); }
+  }
+
+  .seat-deselecting {
+    animation: seat-deselect 0.25s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+  }
+
+  /* ── Legend ── */
   .seat-legend {
     display: flex;
     justify-content: center;
@@ -144,7 +179,7 @@
     flex-shrink: 0;
   }
 
-  /* Summary sidebar */
+  /* ── Summary sidebar ── */
   .booking-summary {
     background: var(--bms-card-bg);
     border: 1px solid var(--bms-border);
@@ -187,7 +222,40 @@
     margin-top: 0.75rem;
   }
 
-  .price-row .amount { color: #4ade80; font-size: 1.2rem; }
+  .price-row .amount {
+    color: #4ade80;
+    font-size: 1.2rem;
+    /* ── ANIMATION: price bump when it updates ── */
+    transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1),
+                color 0.2s ease;
+  }
+
+  .price-bump {
+    animation: price-bump 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+
+  @keyframes price-bump {
+    0%   { transform: scale(1); }
+    50%  { transform: scale(1.25); }
+    100% { transform: scale(1); }
+  }
+
+  /* ── ANIMATION: seat label tags slide in ── */
+  #selected-labels span {
+    display: inline-block;
+    animation: tag-in 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+    background: rgba(248,68,100,0.15);
+    border: 1px solid rgba(248,68,100,0.35);
+    border-radius: 4px;
+    padding: 0 5px;
+    margin: 1px 2px;
+    font-size: 0.78rem;
+  }
+
+  @keyframes tag-in {
+    from { transform: scale(0.5); opacity: 0; }
+    to   { transform: scale(1);   opacity: 1; }
+  }
 
   .error-box {
     background: rgba(248,68,100,0.1);
@@ -318,7 +386,7 @@
       </div>
       <div class="summary-row" id="labels-row" style="display:none;">
         <span>Seats</span>
-        <span id="selected-labels" style="color:var(--bms-red); font-size:0.8rem;"></span>
+        <span id="selected-labels"></span>
       </div>
 
       <div class="price-row">
@@ -351,15 +419,24 @@
   function toggleSeat(el) {
     if (el.classList.contains('seat-booked')) return;
 
-    var seatId = el.dataset.seatId;
-    var label = el.dataset.seatLabel;
+    var seatId  = el.dataset.seatId;
+    var label   = el.dataset.seatLabel;
     var checkbox = document.getElementById('seat_' + seatId);
 
     if (el.classList.contains('seat-selected')) {
-      el.classList.remove('seat-selected');
+      // ── ANIMATION: deselect shrink before removing class ──
+      el.classList.add('seat-deselecting');
+      el.addEventListener('animationend', function handler() {
+        el.classList.remove('seat-selected', 'seat-deselecting');
+        el.removeEventListener('animationend', handler);
+      });
       checkbox.checked = false;
       selectedSeats = selectedSeats.filter(function(s) { return s.id !== seatId; });
     } else {
+      // ── ANIMATION: reset animation so it re-triggers each click ──
+      el.style.animation = 'none';
+      void el.offsetWidth; // force reflow
+      el.style.animation = '';
       el.classList.add('seat-selected');
       checkbox.checked = true;
       selectedSeats.push({ id: seatId, label: label });
@@ -372,18 +449,28 @@
     var count = selectedSeats.length;
     document.getElementById('selected-count').textContent = count;
 
+    // ── ANIMATION: rebuild seat label tags (each animates in) ──
     var labelsRow = document.getElementById('labels-row');
-    var labelsEl = document.getElementById('selected-labels');
+    var labelsEl  = document.getElementById('selected-labels');
 
     if (count > 0) {
-      labelsEl.textContent = selectedSeats.map(function(s) { return s.label; }).join(', ');
+      labelsEl.innerHTML = selectedSeats.map(function(s) {
+        return '<span>' + s.label + '</span>';
+      }).join('');
       labelsRow.style.display = 'flex';
     } else {
+      labelsEl.innerHTML = '';
       labelsRow.style.display = 'none';
     }
 
+    // ── ANIMATION: price bump on change ──
+    var priceEl = document.getElementById('total-price');
+    priceEl.classList.remove('price-bump');
+    void priceEl.offsetWidth; // force reflow
+    priceEl.classList.add('price-bump');
+    priceEl.textContent = '₹' + (count * pricePerSeat).toFixed(2);
+
     document.getElementById('confirm-btn').disabled = (count === 0);
-    document.getElementById('total-price').textContent = '₹' + (count * pricePerSeat).toFixed(2);
   }
 </script>
 {% endblock %}

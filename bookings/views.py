@@ -1,4 +1,6 @@
 from django.db import transaction
+from django.db.models.functions import Cast
+from django.db.models import IntegerField
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from movies.models import Show
@@ -7,7 +9,9 @@ from .models import Seat, Booking
 @login_required
 def book_show(request, show_id):
     show = get_object_or_404(Show, id=show_id)
-    seats = show.seats.all()
+    seats = show.seats.annotate(
+            seat_num_int=Cast('seat_number', IntegerField())
+        ).order_by('row', 'seat_num_int')
 
     if request.method == 'POST':
         print(request.POST)

@@ -1,0 +1,249 @@
+{% extends 'base.html' %}
+{% block title %}Book Tickets — {{ event.title }}{% endblock %}
+
+{% block extra_css %}
+<style>
+  .book-wrapper {
+    max-width: 560px;
+    margin: 2rem auto;
+  }
+
+  .book-card {
+    background: var(--bms-card-bg);
+    border: 1px solid var(--bms-border);
+    border-radius: 16px;
+    padding: 2rem;
+  }
+
+  .event-summary {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+    padding-bottom: 1.25rem;
+    margin-bottom: 1.5rem;
+    border-bottom: 1px solid var(--bms-border);
+  }
+
+  .event-summary-icon {
+    width: 52px; height: 52px;
+    border-radius: 10px;
+    background: rgba(248,68,100,0.12);
+    border: 1px solid rgba(248,68,100,0.25);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.5rem; flex-shrink: 0;
+  }
+
+  .event-summary-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.3rem; letter-spacing: 1.5px; color: #fff;
+  }
+
+  .event-summary-meta { font-size: 0.8rem; color: var(--bms-muted); }
+
+  /* Quantity stepper */
+  .qty-label {
+    font-size: 0.78rem; text-transform: uppercase;
+    letter-spacing: 1px; color: var(--bms-muted); margin-bottom: 0.75rem;
+  }
+
+  .qty-stepper {
+    display: flex; align-items: center; gap: 0;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid var(--bms-border);
+    border-radius: 10px; overflow: hidden;
+    width: fit-content;
+  }
+
+  .qty-btn {
+    width: 48px; height: 48px;
+    background: transparent; border: none;
+    color: var(--bms-text); font-size: 1.3rem;
+    cursor: pointer;
+    transition: background 0.15s, color 0.15s;
+    display: flex; align-items: center; justify-content: center;
+  }
+
+  .qty-btn:hover { background: rgba(248,68,100,0.15); color: var(--bms-red); }
+  .qty-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+
+  .qty-display {
+    width: 64px; text-align: center;
+    font-size: 1.3rem; font-weight: 700; color: #fff;
+    border-left: 1px solid var(--bms-border);
+    border-right: 1px solid var(--bms-border);
+    height: 48px; line-height: 48px;
+    /* animation trigger class */
+    transition: transform 0.15s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+
+  .qty-bump { animation: qty-pop 0.2s cubic-bezier(0.34, 1.56, 0.64, 1); }
+  @keyframes qty-pop {
+    0%   { transform: scale(0.75); }
+    60%  { transform: scale(1.2); }
+    100% { transform: scale(1); }
+  }
+
+  /* Price breakdown */
+  .price-breakdown {
+    background: rgba(255,255,255,0.03);
+    border: 1px solid var(--bms-border);
+    border-radius: 10px;
+    padding: 1rem 1.25rem;
+    margin: 1.5rem 0;
+  }
+
+  .price-row {
+    display: flex; justify-content: space-between;
+    font-size: 0.88rem; color: var(--bms-muted);
+    padding: 0.3rem 0;
+  }
+
+  .price-row span:last-child { color: #fff; font-weight: 500; }
+
+  .price-row.total {
+    border-top: 1px solid var(--bms-border);
+    margin-top: 0.5rem; padding-top: 0.75rem;
+    font-size: 1rem; font-weight: 700;
+  }
+
+  .price-row.total span:last-child {
+    color: #4ade80; font-size: 1.2rem;
+    transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+
+  .price-bump-total { animation: qty-pop 0.25s cubic-bezier(0.34, 1.56, 0.64, 1); }
+
+  .seats-left {
+    font-size: 0.78rem; color: var(--bms-muted);
+    margin-top: 0.5rem;
+  }
+
+  .seats-left span { color: var(--bms-red); font-weight: 600; }
+
+  .error-box {
+    background: rgba(248,68,100,0.1);
+    border: 1px solid rgba(248,68,100,0.35);
+    color: #ffb3c1; border-radius: 8px;
+    padding: 0.75rem 1rem; font-size: 0.88rem;
+    margin-bottom: 1.25rem;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="book-wrapper">
+
+  <div class="breadcrumb-bms mb-3" style="font-size:0.85rem; color:var(--bms-muted);">
+    <a href="{% url 'event_list' %}" style="color:var(--bms-muted);text-decoration:none;">Events</a>
+    <span class="mx-2">/</span>
+    <a href="{% url 'event_detail' event.id %}" style="color:var(--bms-muted);text-decoration:none;">{{ event.title }}</a>
+    <span class="mx-2">/</span>
+    <span style="color:var(--bms-text);">Book Tickets</span>
+  </div>
+
+  <div class="book-card">
+
+    <!-- Event summary -->
+    <div class="event-summary">
+      <div class="event-summary-icon">
+        {% if event.event_type == 'concert' %}🎵
+        {% elif event.event_type == 'sport' %}🏆
+        {% elif event.event_type == 'comedy' %}😂
+        {% elif event.event_type == 'theatre' %}🎭
+        {% elif event.event_type == 'festival' %}🎪
+        {% else %}🎟️{% endif %}
+      </div>
+      <div>
+        <div class="event-summary-title">{{ event.title }}</div>
+        <div class="event-summary-meta">
+          {{ event.event_date }} · {{ event.event_time }}
+          {% if event.venue %} · {{ event.venue.name }}{% endif %}
+        </div>
+      </div>
+    </div>
+
+    {% if messages %}
+      {% for msg in messages %}
+        <div class="error-box"><i class="bi bi-exclamation-circle me-2"></i>{{ msg }}</div>
+      {% endfor %}
+    {% endif %}
+
+    <form method="post" id="booking-form">
+      {% csrf_token %}
+      <input type="hidden" name="quantity" id="qty-input" value="1">
+
+      <!-- Quantity stepper -->
+      <div class="qty-label">Number of Tickets</div>
+      <div class="qty-stepper">
+        <button type="button" class="qty-btn" id="qty-minus" onclick="changeQty(-1)" disabled>−</button>
+        <div class="qty-display" id="qty-display">1</div>
+        <button type="button" class="qty-btn" id="qty-plus" onclick="changeQty(1)">+</button>
+      </div>
+      <div class="seats-left mt-2">
+        <span>{{ event.available_seats }}</span> seat(s) available · max 10 per booking
+      </div>
+
+      <!-- Price breakdown -->
+      <div class="price-breakdown">
+        <div class="price-row">
+          <span>Price per ticket</span>
+          <span>₹{{ event.price }}</span>
+        </div>
+        <div class="price-row">
+          <span>Tickets</span>
+          <span id="qty-label-display">× 1</span>
+        </div>
+        <div class="price-row total">
+          <span>Total</span>
+          <span id="total-display">₹{{ event.price }}</span>
+        </div>
+      </div>
+
+      <button type="submit" class="btn btn-bms-primary w-100 py-2" style="font-size:1rem;">
+        <i class="bi bi-check-circle me-2"></i>Confirm Booking
+      </button>
+
+      <a href="{% url 'event_detail' event.id %}" class="btn btn-bms-outline w-100 py-2 mt-2" style="font-size:0.9rem;">
+        <i class="bi bi-arrow-left me-1"></i>Back to Event
+      </a>
+    </form>
+
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  var maxSeats = Math.min(10, parseInt("{{ event.available_seats|default:0 }}", 10));
+  var pricePerTicket = parseFloat("{{ event.price }}");
+  var qty = 1;
+
+  function changeQty(delta) {
+    qty = Math.max(1, Math.min(maxSeats, qty + delta));
+
+    // Update hidden input
+    document.getElementById('qty-input').value = qty;
+
+    // Animate the number display
+    var display = document.getElementById('qty-display');
+    display.classList.remove('qty-bump');
+    void display.offsetWidth;
+    display.classList.add('qty-bump');
+    display.textContent = qty;
+
+    // Update price
+    var total = (pricePerTicket * qty).toFixed(2);
+    var totalEl = document.getElementById('total-display');
+    totalEl.classList.remove('price-bump-total');
+    void totalEl.offsetWidth;
+    totalEl.classList.add('price-bump-total');
+    totalEl.textContent = '₹' + total;
+
+    document.getElementById('qty-label-display').textContent = '× ' + qty;
+
+    // Toggle buttons
+    document.getElementById('qty-minus').disabled = (qty <= 1);
+    document.getElementById('qty-plus').disabled  = (qty >= maxSeats);
+  }
+</script>
+{% endblock %}

@@ -76,7 +76,8 @@
           <div style="font-size:0.78rem; color:var(--bms-muted);">per person</div>
         </div>
         {% if event.available_seats > 0 %}
-          <a href="#" class="btn btn-bms-primary px-5 py-2" style="font-size:1rem;">
+          <!-- ✅ FIXED: was href="#", now points to the real booking URL -->
+          <a href="{% url 'book_event' event.id %}" class="btn btn-bms-primary px-5 py-2" style="font-size:1rem;">
             <i class="bi bi-ticket-perforated me-2"></i>Book Tickets
           </a>
         {% else %}
