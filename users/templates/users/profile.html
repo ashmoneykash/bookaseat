@@ -1,0 +1,327 @@
+{% extends 'base.html' %}
+{% block title %}My Profile — BookASeat{% endblock %}
+
+{% block extra_css %}
+<style>
+  .profile-wrapper {
+    max-width: 820px;
+    margin: 0 auto;
+  }
+
+  .profile-header {
+    background: var(--bms-card-bg);
+    border: 1px solid var(--bms-border);
+    border-radius: 16px;
+    padding: 2rem;
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+  }
+
+  .profile-avatar-wrap { position: relative; flex-shrink: 0; }
+
+  .profile-avatar {
+    width: 90px; height: 90px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid var(--bms-red);
+  }
+
+  .profile-avatar-placeholder {
+    width: 90px; height: 90px;
+    border-radius: 50%;
+    background: rgba(248,68,100,0.12);
+    border: 3px solid var(--bms-red);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 2.5rem; color: var(--bms-red);
+  }
+
+  .avatar-edit-btn {
+    position: absolute; bottom: 0; right: 0;
+    width: 28px; height: 28px;
+    background: var(--bms-red); border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.7rem; color: #fff; cursor: pointer;
+    border: 2px solid var(--bms-card-bg);
+    transition: transform 0.2s;
+  }
+  .avatar-edit-btn:hover { transform: scale(1.15); }
+
+  .profile-name {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.8rem; letter-spacing: 2px; color: #fff;
+    margin-bottom: 0.2rem;
+  }
+
+  .profile-username {
+    font-size: 0.85rem; color: var(--bms-muted);
+    margin-bottom: 0.5rem;
+  }
+
+  .profile-joined {
+    font-size: 0.78rem; color: var(--bms-muted);
+  }
+
+  /* Cards */
+  .profile-card {
+    background: var(--bms-card-bg);
+    border: 1px solid var(--bms-border);
+    border-radius: 16px;
+    padding: 1.75rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .profile-card-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.1rem; letter-spacing: 1.5px;
+    color: #fff; margin-bottom: 1.25rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid var(--bms-border);
+    display: flex; align-items: center; gap: 0.5rem;
+  }
+
+  /* Form fields */
+  .form-group { margin-bottom: 1.1rem; }
+
+  .form-group label {
+    font-size: 0.75rem; text-transform: uppercase;
+    letter-spacing: 1px; color: var(--bms-muted);
+    display: block; margin-bottom: 0.4rem;
+  }
+
+  .form-control-bms {
+    width: 100%;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid var(--bms-border);
+    border-radius: 8px;
+    padding: 0.65rem 1rem;
+    color: var(--bms-text);
+    font-size: 0.9rem;
+    font-family: 'DM Sans', sans-serif;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    outline: none;
+  }
+
+  .form-control-bms:focus {
+    border-color: var(--bms-red);
+    box-shadow: 0 0 0 3px rgba(248,68,100,0.12);
+  }
+
+  .form-control-bms::placeholder { color: var(--bms-muted); }
+
+  textarea.form-control-bms { resize: vertical; min-height: 80px; }
+
+  .form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+  }
+
+  @media (max-width: 576px) { .form-grid { grid-template-columns: 1fr; } }
+
+  /* Alerts */
+  .alert-bms {
+    border-radius: 8px; padding: 0.75rem 1rem;
+    font-size: 0.88rem; margin-bottom: 1.25rem;
+    display: flex; align-items: center; gap: 0.5rem;
+  }
+
+  .alert-success-bms {
+    background: rgba(74,222,128,0.1);
+    border: 1px solid rgba(74,222,128,0.3);
+    color: #4ade80;
+  }
+
+  .alert-error-bms {
+    background: rgba(248,68,100,0.1);
+    border: 1px solid rgba(248,68,100,0.3);
+    color: #ffb3c1;
+  }
+
+  /* Password strength */
+  .pwd-strength { margin-top: 0.4rem; }
+  .pwd-bar-wrap { height: 4px; background: var(--bms-border); border-radius: 99px; margin-bottom: 0.3rem; }
+  .pwd-bar { height: 100%; border-radius: 99px; width: 0; transition: width 0.3s, background 0.3s; }
+  .pwd-hint { font-size: 0.72rem; color: var(--bms-muted); }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="profile-wrapper">
+
+  <div class="section-heading">MY PROFILE</div>
+  <div class="section-divider"></div>
+
+  {% for msg in messages %}
+    <div class="alert-bms {% if 'success' in msg.tags %}alert-success-bms{% else %}alert-error-bms{% endif %}">
+      <i class="bi bi-{% if 'success' in msg.tags %}check-circle{% else %}exclamation-circle{% endif %}"></i>
+      {{ msg }}
+    </div>
+  {% endfor %}
+
+  <!-- Profile Header -->
+  <div class="profile-header">
+    <div class="profile-avatar-wrap">
+      {% if user_profile.profile_pic %}
+        <img src="{{ user_profile.profile_pic.url }}" class="profile-avatar" alt="Profile">
+      {% else %}
+        <div class="profile-avatar-placeholder">
+          <i class="bi bi-person-fill"></i>
+        </div>
+      {% endif %}
+      <label for="pic-upload-trigger" class="avatar-edit-btn" title="Change photo">
+        <i class="bi bi-camera-fill"></i>
+      </label>
+    </div>
+    <div>
+      <div class="profile-name">
+        {% if request.user.first_name %}
+          {{ request.user.first_name }} {{ request.user.last_name }}
+        {% else %}
+          {{ request.user.username }}
+        {% endif %}
+      </div>
+      <div class="profile-username"><i class="bi bi-at"></i>{{ request.user.username }}</div>
+      {% if request.user.email %}
+        <div class="profile-username"><i class="bi bi-envelope me-1"></i>{{ request.user.email }}</div>
+      {% endif %}
+      <div class="profile-joined">
+        <i class="bi bi-calendar3 me-1"></i>Joined {{ request.user.date_joined|date:"F Y" }}
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Edit Info ── -->
+  <div class="profile-card">
+    <div class="profile-card-title">
+      <i class="bi bi-person-gear" style="color:var(--bms-red);"></i> Personal Information
+    </div>
+
+    <form method="post" enctype="multipart/form-data">
+      {% csrf_token %}
+      <input type="hidden" name="action" value="update_info">
+
+      <!-- Hidden file input triggered by camera button -->
+      <input type="file" name="profile_pic" id="pic-upload-trigger"
+             accept="image/*" style="display:none;"
+             onchange="previewPic(this)">
+
+      <div class="form-grid">
+        <div class="form-group">
+          <label>First Name</label>
+          <input type="text" name="first_name" class="form-control-bms"
+                 value="{{ request.user.first_name }}" placeholder="First name">
+        </div>
+        <div class="form-group">
+          <label>Last Name</label>
+          <input type="text" name="last_name" class="form-control-bms"
+                 value="{{ request.user.last_name }}" placeholder="Last name">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Email Address</label>
+        <input type="email" name="email" class="form-control-bms"
+               value="{{ request.user.email }}" placeholder="your@email.com">
+      </div>
+
+      <div class="form-group">
+        <label>Phone Number</label>
+        <input type="text" name="phone" class="form-control-bms"
+               value="{{ user_profile.phone|default:'' }}" placeholder="+91 00000 00000">
+      </div>
+
+      <div class="form-group">
+        <label>Address</label>
+        <textarea name="address" class="form-control-bms"
+                  placeholder="Your address">{{ user_profile.address|default:'' }}</textarea>
+      </div>
+
+      <button type="submit" class="btn btn-bms-primary px-4 py-2">
+        <i class="bi bi-check-circle me-2"></i>Save Changes
+      </button>
+    </form>
+  </div>
+
+  <!-- ── Change Password ── -->
+  <div class="profile-card">
+    <div class="profile-card-title">
+      <i class="bi bi-shield-lock" style="color:var(--bms-red);"></i> Change Password
+    </div>
+
+    <form method="post">
+      {% csrf_token %}
+      <input type="hidden" name="action" value="change_password">
+
+      <div class="form-group">
+        <label>Current Password</label>
+        <input type="password" name="old_password" class="form-control-bms"
+               placeholder="Enter current password">
+      </div>
+
+      <div class="form-group">
+        <label>New Password</label>
+        <input type="password" name="new_password1" class="form-control-bms"
+               placeholder="Enter new password" id="new-pwd" oninput="checkStrength(this.value)">
+        <div class="pwd-strength">
+          <div class="pwd-bar-wrap"><div class="pwd-bar" id="pwd-bar"></div></div>
+          <div class="pwd-hint" id="pwd-hint">Enter a password</div>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Confirm New Password</label>
+        <input type="password" name="new_password2" class="form-control-bms"
+               placeholder="Repeat new password">
+      </div>
+
+      <button type="submit" class="btn btn-bms-primary px-4 py-2">
+        <i class="bi bi-lock me-2"></i>Update Password
+      </button>
+    </form>
+  </div>
+
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  // Profile pic preview before upload
+  function previewPic(input) {
+    if (input.files && input.files[0]) {
+      var reader = new FileReader();
+      reader.onload = function(e) {
+        var wrap = document.querySelector('.profile-avatar-wrap');
+        var existing = wrap.querySelector('.profile-avatar, .profile-avatar-placeholder');
+        var img = document.createElement('img');
+        img.src = e.target.result;
+        img.className = 'profile-avatar';
+        img.alt = 'Profile';
+        existing.replaceWith(img);
+      };
+      reader.readAsDataURL(input.files[0]);
+    }
+  }
+
+  // Password strength meter
+  function checkStrength(pwd) {
+    var bar  = document.getElementById('pwd-bar');
+    var hint = document.getElementById('pwd-hint');
+    var score = 0;
+    if (pwd.length >= 8) score++;
+    if (/[A-Z]/.test(pwd)) score++;
+    if (/[0-9]/.test(pwd)) score++;
+    if (/[^A-Za-z0-9]/.test(pwd)) score++;
+
+    var widths = ['0%', '25%', '50%', '75%', '100%'];
+    var colors = ['transparent', '#ef4444', '#fbbf24', '#60a5fa', '#4ade80'];
+    var hints  = ['Enter a password', 'Too weak', 'Could be stronger', 'Getting better', 'Strong password!'];
+
+    bar.style.width      = widths[score];
+    bar.style.background = colors[score];
+    hint.textContent     = hints[score];
+  }
+</script>
+{% endblock %}
