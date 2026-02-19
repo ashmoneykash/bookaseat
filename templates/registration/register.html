@@ -1,0 +1,82 @@
+{% extends 'base.html' %}
+
+{% block title %}Register — BookASeat{% endblock %}
+
+{% block content %}
+<div style="max-width: 420px; margin: 3rem auto;">
+
+  <div style="text-align:center; margin-bottom:2rem;">
+    <div style="font-family:'Bebas Neue',sans-serif; font-size:2.5rem; letter-spacing:3px; color:#fff;">
+      CREATE ACCOUNT
+    </div>
+    <p style="color:var(--bms-muted); font-size:0.9rem;">Sign up to start booking</p>
+  </div>
+
+  <div style="background:var(--bms-card-bg); border:1px solid var(--bms-border); border-radius:14px; padding:2rem;">
+
+    {% if form.errors %}
+      <div style="background:rgba(248,68,100,0.1); border:1px solid rgba(248,68,100,0.3); color:#ffb3c1; border-radius:8px; padding:0.75rem 1rem; margin-bottom:1.25rem; font-size:0.88rem;">
+        <i class="bi bi-exclamation-circle me-2"></i>Please fix the errors below.
+      </div>
+    {% endif %}
+
+    <form method="post">
+      {% csrf_token %}
+
+      <!-- Username -->
+      <div style="margin-bottom:1.25rem;">
+        <label style="font-size:0.75rem; font-weight:700; text-transform:uppercase; letter-spacing:1px; color:var(--bms-muted); display:block; margin-bottom:0.4rem;">
+          Username
+        </label>
+        <input type="text" name="username" value="{{ form.username.value|default:'' }}" autofocus required
+               style="width:100%; background:#0d0d1a; border:1px solid var(--bms-border); border-radius:8px; color:#fff; padding:0.65rem 1rem; font-size:0.9rem; outline:none; font-family:'DM Sans',sans-serif;"
+               onfocus="this.style.borderColor='#f84464'" onblur="this.style.borderColor='var(--bms-border)'" />
+        {% if form.username.errors %}
+          <div style="color:#f87171; font-size:0.78rem; margin-top:0.3rem;">{{ form.username.errors|join:", " }}</div>
+        {% endif %}
+      </div>
+
+      <!-- Password1 -->
+      <div style="margin-bottom:1.25rem;">
+        <label style="font-size:0.75rem; font-weight:700; text-transform:uppercase; letter-spacing:1px; color:var(--bms-muted); display:block; margin-bottom:0.4rem;">
+          Password
+        </label>
+        <input type="password" name="password1" required
+               style="width:100%; background:#0d0d1a; border:1px solid var(--bms-border); border-radius:8px; color:#fff; padding:0.65rem 1rem; font-size:0.9rem; outline:none; font-family:'DM Sans',sans-serif;"
+               onfocus="this.style.borderColor='#f84464'" onblur="this.style.borderColor='var(--bms-border)'" />
+        {% if form.password1.errors %}
+          <div style="color:#f87171; font-size:0.78rem; margin-top:0.3rem;">{{ form.password1.errors|join:", " }}</div>
+        {% endif %}
+        <div style="font-size:0.72rem; color:var(--bms-muted); margin-top:0.3rem;">
+          Min 8 characters. Can't be too common.
+        </div>
+      </div>
+
+      <!-- Password2 -->
+      <div style="margin-bottom:1.5rem;">
+        <label style="font-size:0.75rem; font-weight:700; text-transform:uppercase; letter-spacing:1px; color:var(--bms-muted); display:block; margin-bottom:0.4rem;">
+          Confirm Password
+        </label>
+        <input type="password" name="password2" required
+               style="width:100%; background:#0d0d1a; border:1px solid var(--bms-border); border-radius:8px; color:#fff; padding:0.65rem 1rem; font-size:0.9rem; outline:none; font-family:'DM Sans',sans-serif;"
+               onfocus="this.style.borderColor='#f84464'" onblur="this.style.borderColor='var(--bms-border)'" />
+        {% if form.password2.errors %}
+          <div style="color:#f87171; font-size:0.78rem; margin-top:0.3rem;">{{ form.password2.errors|join:", " }}</div>
+        {% endif %}
+      </div>
+
+      <button type="submit"
+              style="width:100%; background:#f84464; color:#fff; border:none; border-radius:8px; padding:0.75rem; font-size:0.95rem; font-weight:700; cursor:pointer; letter-spacing:0.5px;"
+              onmouseover="this.style.background='#d93558'" onmouseout="this.style.background='#f84464'">
+        <i class="bi bi-person-plus me-2"></i>Create Account
+      </button>
+    </form>
+
+    <div style="text-align:center; margin-top:1.25rem; font-size:0.85rem; color:var(--bms-muted);">
+      Already have an account?
+      <a href="{% url 'login' %}" style="color:var(--bms-red); text-decoration:none; font-weight:600;">Login</a>
+    </div>
+
+  </div>
+</div>
+{% endblock %}

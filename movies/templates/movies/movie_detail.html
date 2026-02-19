@@ -1,28 +1,191 @@
-{% extends "base.html" %}
+{% extends 'base.html' %}
 
-{% block title %}{{ movie.title }}{% endblock %}
+{% block title %}{{ movie.title }} — BookASeat{% endblock %}
+
+{% block extra_css %}
+<style>
+  .detail-poster {
+    width: 100%;
+    border-radius: 12px;
+    object-fit: cover;
+    box-shadow: 0 8px 40px rgba(0,0,0,0.6);
+    aspect-ratio: 2/3;
+  }
+
+  .poster-placeholder {
+    width: 100%;
+    aspect-ratio: 2/3;
+    border-radius: 12px;
+    background: linear-gradient(135deg, #1a1a2e 0%, #0f3460 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--bms-muted);
+    font-size: 5rem;
+    box-shadow: 0 8px 40px rgba(0,0,0,0.6);
+  }
+
+  .movie-detail-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 2.8rem;
+    letter-spacing: 2px;
+    color: #fff;
+    line-height: 1.1;
+    margin-bottom: 1rem;
+  }
+
+  .meta-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid var(--bms-border);
+    border-radius: 6px;
+    padding: 0.3rem 0.75rem;
+    font-size: 0.82rem;
+    color: var(--bms-text);
+    margin-right: 0.5rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .meta-chip i { color: var(--bms-red); }
+
+  .desc-text {
+    color: var(--bms-muted);
+    line-height: 1.7;
+    font-size: 0.95rem;
+  }
+
+  .shows-section {
+    background: var(--bms-card-bg);
+    border: 1px solid var(--bms-border);
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-top: 1.5rem;
+  }
+
+  .shows-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.3rem;
+    letter-spacing: 1.5px;
+    color: #fff;
+    margin-bottom: 1rem;
+  }
+
+  .show-date-group { margin-bottom: 1.25rem; }
+
+  .show-date-label {
+    font-size: 0.78rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--bms-muted);
+    margin-bottom: 0.6rem;
+  }
+
+  .btn-show-time {
+    background: transparent;
+    color: var(--bms-red);
+    border: 1.5px solid var(--bms-red);
+    border-radius: 8px;
+    padding: 0.45rem 1.1rem;
+    font-size: 0.88rem;
+    font-weight: 600;
+    margin-right: 0.5rem;
+    margin-bottom: 0.5rem;
+    transition: all 0.2s ease;
+    text-decoration: none;
+    display: inline-block;
+  }
+
+  .btn-show-time:hover {
+    background: var(--bms-red);
+    color: #fff;
+    box-shadow: 0 4px 15px rgba(248,68,100,0.35);
+  }
+
+  .breadcrumb-bms a {
+    color: var(--bms-muted);
+    text-decoration: none;
+    font-size: 0.85rem;
+  }
+
+  .breadcrumb-bms a:hover { color: var(--bms-red); }
+  .breadcrumb-bms span { color: var(--bms-muted); font-size: 0.85rem; }
+</style>
+{% endblock %}
 
 {% block content %}
-<div class="row">
-    <div class="col-md-4">
-        {% if movie.poster %}
-        <img src="{{ movie.poster.url }}" class="img-fluid rounded shadow" alt="{{ movie.title }}">
-        {% else %}
-        <div class="bg-secondary text-white text-center py-5 rounded">
-            No Image Available
-        </div>
-        {% endif %}
+<!-- Breadcrumb -->
+<div class="breadcrumb-bms mb-3">
+  <a href="{% url 'movie_list' %}"><i class="bi bi-house me-1"></i>Home</a>
+  <span class="mx-2">/</span>
+  <span style="color:var(--bms-text);">{{ movie.title }}</span>
+</div>
+
+<div class="row g-4">
+  <!-- Poster -->
+  <div class="col-md-3">
+    {% if movie.poster %}
+      <img src="{{ movie.poster.url }}" alt="{{ movie.title }}" class="detail-poster" />
+    {% else %}
+      <div class="poster-placeholder"><i class="bi bi-film"></i></div>
+    {% endif %}
+  </div>
+
+  <!-- Info -->
+  <div class="col-md-9">
+    <div class="movie-detail-title">{{ movie.title }}</div>
+
+    <!-- Meta chips -->
+    <div class="mb-3">
+      {% if movie.language %}
+        <span class="meta-chip"><i class="bi bi-translate"></i>{{ movie.language }}</span>
+      {% endif %}
+      {% if movie.duration %}
+        <span class="meta-chip"><i class="bi bi-clock"></i>{{ movie.duration }} min</span>
+      {% endif %}
+      {% if movie.release_date %}
+        <span class="meta-chip"><i class="bi bi-calendar3"></i>{{ movie.release_date }}</span>
+      {% endif %}
     </div>
 
-    <div class="col-md-8">
-        <h2>{{ movie.title }}</h2>
-        <p class="text-muted mt-3">
-            {{ movie.description }}
+    <!-- Description -->
+    {% if movie.description %}
+      <p class="desc-text">{{ movie.description }}</p>
+    {% endif %}
+
+    <!-- Shows -->
+    <div class="shows-section">
+      <div class="shows-title">
+        <i class="bi bi-calendar3 me-2" style="color:var(--bms-red);"></i>AVAILABLE SHOWS
+      </div>
+
+      {% if shows %}
+        {% regroup shows by show_date as shows_by_date %}
+        {% for date_group in shows_by_date %}
+          <div class="show-date-group">
+            <div class="show-date-label">
+              <i class="bi bi-calendar-event me-1"></i>{{ date_group.grouper }}
+            </div>
+            <div>
+              {% for show in date_group.list %}
+                <a href="{% url 'book_show' show.pk %}" class="btn-show-time">
+                  <i class="bi bi-clock me-1"></i>{{ show.show_time }}
+                  <span style="font-size:0.75rem; opacity:0.7; margin-left:0.3rem;">
+                    — {{ show.theatre.name }}
+                  </span>
+                </a>
+              {% endfor %}
+            </div>
+          </div>
+        {% endfor %}
+      {% else %}
+        <p style="color:var(--bms-muted); font-size:0.9rem;">
+          <i class="bi bi-info-circle me-2"></i>No shows scheduled currently.
         </p>
-
-        <a href="#" class="btn btn-success mt-4">
-            Book Seats
-        </a>
+      {% endif %}
     </div>
+  </div>
 </div>
 {% endblock %}

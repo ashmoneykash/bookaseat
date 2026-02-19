@@ -1,24 +1,66 @@
-<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+<nav class="bms-navbar navbar navbar-expand-lg">
   <div class="container">
-    <a class="navbar-brand fw-bold" href="/">BookASeat</a>
+    <a class="bms-brand navbar-brand" href="{% url 'movie_list' %}">
+      BOOK<span>A</span>SEAT
+    </a>
 
-    <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
-            data-bs-target="#mainNavbar" aria-controls="mainNavbar"
-            aria-expanded="false" aria-label="Toggle navigation">
-      <span class="navbar-toggler-icon"></span>
+    <button class="navbar-toggler border-0 shadow-none" type="button"
+            data-bs-toggle="collapse" data-bs-target="#navbarNav"
+            style="color: var(--bms-text);">
+      <i class="bi bi-list" style="font-size:1.5rem;"></i>
     </button>
 
-    <div class="collapse navbar-collapse" id="mainNavbar">
-      <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav ms-auto align-items-lg-center gap-1">
         <li class="nav-item">
-          <a class="nav-link" href="/movies/">Movies</a>
+          <a class="nav-link-bms nav-link" href="{% url 'movie_list' %}">
+            <i class="bi bi-house me-1"></i>Home
+          </a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="#">Bookings</a>
+          <a class="nav-link-bms nav-link" href="{% url 'event_list' %}">
+            <i class="bi bi-calendar-event me-1"></i>Events
+          </a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="#">Payments</a>
+          <a class="nav-link-bms nav-link" href="{% url 'my_bookings' %}">
+            <i class="bi bi-ticket-perforated me-1"></i>My Bookings
+          </a>
         </li>
+
+        {% if user.is_authenticated %}
+          {% if user.is_staff %}
+            <li class="nav-item">
+              <a class="nav-link-bms nav-link" href="{% url 'dashboard_home' %}" style="color:#fbbf24 !important;">
+                <i class="bi bi-speedometer2 me-1"></i>Admin
+              </a>
+            </li>
+          {% endif %}
+          <li class="nav-item ms-lg-2">
+            <span class="nav-link-bms nav-link" style="color: var(--bms-muted) !important; cursor:default;">
+              <i class="bi bi-person-circle me-1"></i>{{ user.username }}
+            </span>
+          </li>
+          <li class="nav-item">
+            <form method="post" action="{% url 'logout' %}" style="display:inline;">
+              {% csrf_token %}
+              <button type="submit" class="btn-navbar-cta nav-link" style="background:none; border:none; cursor:pointer;">
+                <i class="bi bi-box-arrow-right me-1"></i>Logout
+              </button>
+            </form>
+          </li>
+        {% else %}
+          <li class="nav-item">
+            <a class="nav-link-bms nav-link" href="{% url 'register' %}">
+              <i class="bi bi-person-plus me-1"></i>Register
+            </a>
+          </li>
+          <li class="nav-item ms-lg-2">
+            <a class="btn-navbar-cta nav-link" href="{% url 'login' %}">
+              <i class="bi bi-box-arrow-in-right me-1"></i>Login
+            </a>
+          </li>
+        {% endif %}
       </ul>
     </div>
   </div>

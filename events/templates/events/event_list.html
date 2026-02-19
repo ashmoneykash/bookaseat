@@ -1,0 +1,99 @@
+{% extends 'base.html' %}
+{% block title %}Events — BookASeat{% endblock %}
+
+{% block extra_css %}
+<style>
+  .cat-tab {
+    display: inline-flex; align-items: center; gap: 0.4rem;
+    padding: 0.5rem 1.1rem; border-radius: 30px; font-size: 0.85rem; font-weight: 600;
+    text-decoration: none; border: 1.5px solid var(--bms-border); color: var(--bms-muted);
+    transition: all 0.2s ease; background: var(--bms-card-bg);
+  }
+  .cat-tab:hover, .cat-tab.active { border-color: var(--bms-red); color: #fff; background: rgba(248,68,100,0.1); }
+
+  .item-card {
+    background: var(--bms-card-bg); border: 1px solid var(--bms-border); border-radius: 12px;
+    overflow: hidden; transition: transform 0.25s, box-shadow 0.25s; height: 100%;
+  }
+  .item-card:hover { transform: translateY(-6px); box-shadow: 0 12px 40px rgba(248,68,100,0.2); border-color: rgba(248,68,100,0.4); }
+  .item-poster { width: 100%; aspect-ratio: 2/3; object-fit: cover; }
+  .poster-placeholder { width: 100%; aspect-ratio: 2/3; background: linear-gradient(135deg, #1a1a2e 0%, #0f3460 100%); display: flex; align-items: center; justify-content: center; color: var(--bms-muted); font-size: 3rem; }
+  .item-body { padding: 1rem; }
+  .item-title { font-weight: 700; font-size: 0.95rem; color: #fff; margin-bottom: 0.35rem; display: -webkit-box; -webkit-line-clamp: 2; line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; min-height: 2.8em; }
+  .item-meta { font-size: 0.78rem; color: var(--bms-muted); margin-bottom: 0.75rem; }
+  .type-badge { font-size: 0.68rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; padding: 0.2rem 0.6rem; border-radius: 20px; margin-bottom: 0.75rem; display: inline-block; }
+  .type-concert { background: rgba(167,139,250,0.15); color: #a78bfa; border: 1px solid rgba(167,139,250,0.3); }
+  .type-sport   { background: rgba(251,191,36,0.15);  color: #fbbf24; border: 1px solid rgba(251,191,36,0.3); }
+  .type-comedy  { background: rgba(251,146,60,0.15);  color: #fb923c; border: 1px solid rgba(251,146,60,0.3); }
+  .type-theatre { background: rgba(52,211,153,0.15);  color: #34d399; border: 1px solid rgba(34,197,94,0.3); }
+  .type-festival{ background: rgba(96,165,250,0.15);  color: #60a5fa; border: 1px solid rgba(96,165,250,0.3); }
+  .type-other   { background: rgba(148,163,184,0.1);  color: #94a3b8; border: 1px solid rgba(148,163,184,0.2); }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="section-heading">EVENTS & MORE</div>
+<div class="section-divider"></div>
+
+<!-- Filter tabs -->
+<div style="display:flex; gap:0.5rem; flex-wrap:wrap; margin-bottom:2rem;">
+  <a href="{% url 'event_list' %}" class="cat-tab {% if not selected_type %}active{% endif %}">
+    <i class="bi bi-grid"></i> All
+  </a>
+  {% for val, label in event_types %}
+    <a href="{% url 'event_list' %}?type={{ val }}" class="cat-tab {% if selected_type == val %}active{% endif %}">
+      {% if val == 'concert' %}<i class="bi bi-music-note-beamed"></i>
+      {% elif val == 'sport' %}<i class="bi bi-trophy"></i>
+      {% elif val == 'comedy' %}<i class="bi bi-emoji-laughing"></i>
+      {% elif val == 'theatre' %}<i class="bi bi-mask"></i>
+      {% elif val == 'festival' %}<i class="bi bi-star"></i>
+      {% else %}<i class="bi bi-calendar-event"></i>{% endif %}
+      {{ label }}
+    </a>
+  {% endfor %}
+</div>
+
+{% if events %}
+  <div class="row row-cols-2 row-cols-md-3 row-cols-lg-4 g-4">
+    {% for event in events %}
+      <div class="col">
+        <div class="item-card h-100">
+          {% if event.poster %}
+            <img src="{{ event.poster.url }}" alt="{{ event.title }}" class="item-poster" />
+          {% else %}
+            <div class="poster-placeholder">
+              {% if event.event_type == 'concert' %}<i class="bi bi-music-note-beamed"></i>
+              {% elif event.event_type == 'sport' %}<i class="bi bi-trophy"></i>
+              {% elif event.event_type == 'comedy' %}<i class="bi bi-emoji-laughing"></i>
+              {% elif event.event_type == 'theatre' %}<i class="bi bi-mask"></i>
+              {% else %}<i class="bi bi-calendar-event"></i>{% endif %}
+            </div>
+          {% endif %}
+          <div class="item-body d-flex flex-column">
+            <span class="type-badge type-{{ event.event_type }}">{{ event.get_event_type_display }}</span>
+            <div class="item-title">{{ event.title }}</div>
+            <div class="item-meta">
+              <div><i class="bi bi-calendar3 me-1"></i>{{ event.event_date }} &nbsp; <i class="bi bi-clock me-1"></i>{{ event.event_time }}</div>
+              {% if event.venue %}<div><i class="bi bi-geo-alt me-1"></i>{{ event.venue.name }}, {{ event.venue.city }}</div>{% endif %}
+              <div style="color:#4ade80; font-weight:600; margin-top:0.2rem;"><i class="bi bi-currency-rupee"></i>{{ event.price }} onwards</div>
+            </div>
+            <div class="mt-auto">
+              <a href="{% url 'event_detail' event.pk %}" class="btn btn-bms-primary w-100">
+                <i class="bi bi-ticket-perforated me-1"></i>Book Now
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+{% else %}
+  <div style="text-align:center; padding:5rem 0;">
+    <i class="bi bi-calendar-x" style="font-size:4rem; color:rgba(248,68,100,0.2); display:block; margin-bottom:1rem;"></i>
+    <p style="color:var(--bms-muted);">No events found{% if selected_type %} for this category{% endif %}.</p>
+    {% if selected_type %}
+      <a href="{% url 'event_list' %}" class="btn btn-bms-outline mt-2">View All Events</a>
+    {% endif %}
+  </div>
+{% endif %}
+{% endblock %}

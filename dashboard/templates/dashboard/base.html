@@ -1,0 +1,560 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{% block title %}Admin — BookASeat{% endblock %}</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --red: #f84464;
+      --red-dim: rgba(248,68,100,0.12);
+      --sidebar-w: 240px;
+      --bg: #080810;
+      --surface: #10101e;
+      --surface2: #181828;
+      --border: #1e1e35;
+      --text: #c8cee0;
+      --muted: #5a6280;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'DM Sans', sans-serif;
+      display: flex;
+      min-height: 100vh;
+    }
+
+    /* ── Sidebar ── */
+    .sidebar {
+      width: var(--sidebar-w);
+      background: var(--surface);
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      position: fixed;
+      top: 0; left: 0; bottom: 0;
+      z-index: 100;
+      overflow-y: auto;
+    }
+
+    .sidebar-brand {
+      padding: 1.5rem 1.25rem 1rem;
+      border-bottom: 1px solid var(--border);
+      text-decoration: none;
+    }
+
+    .sidebar-brand .logo {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.5rem;
+      letter-spacing: 2px;
+      color: var(--red);
+      display: block;
+    }
+
+    .sidebar-brand .sub {
+      font-size: 0.68rem;
+      color: var(--muted);
+      letter-spacing: 2px;
+      text-transform: uppercase;
+    }
+
+    .sidebar-section {
+      padding: 1.25rem 0 0;
+    }
+
+    .sidebar-label {
+      font-size: 0.65rem;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--muted);
+      padding: 0 1.25rem 0.5rem;
+    }
+
+    .sidebar-link {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 0.6rem 1.25rem;
+      color: var(--text);
+      text-decoration: none;
+      font-size: 0.88rem;
+      font-weight: 500;
+      transition: all 0.15s ease;
+      border-left: 3px solid transparent;
+    }
+
+    .sidebar-link i {
+      font-size: 1rem;
+      width: 20px;
+      text-align: center;
+      color: var(--muted);
+      transition: color 0.15s;
+    }
+
+    .sidebar-link:hover {
+      background: var(--red-dim);
+      color: #fff;
+      border-left-color: var(--red);
+    }
+
+    .sidebar-link:hover i { color: var(--red); }
+
+    .sidebar-link.active {
+      background: var(--red-dim);
+      color: #fff;
+      border-left-color: var(--red);
+    }
+
+    .sidebar-link.active i { color: var(--red); }
+
+    .sidebar-footer {
+      margin-top: auto;
+      padding: 1rem 1.25rem;
+      border-top: 1px solid var(--border);
+      font-size: 0.78rem;
+      color: var(--muted);
+    }
+
+    /* ── Main ── */
+    .main-wrap {
+      margin-left: var(--sidebar-w);
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+
+    .topbar {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: 0.85rem 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 50;
+    }
+
+    .topbar-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.3rem;
+      letter-spacing: 2px;
+      color: #fff;
+    }
+
+    .topbar-right {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      font-size: 0.82rem;
+      color: var(--muted);
+    }
+
+    .topbar-user {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .topbar-avatar {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: var(--red-dim);
+      border: 1px solid rgba(248,68,100,0.3);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--red);
+      font-size: 0.9rem;
+    }
+
+    .page-content {
+      padding: 2rem;
+      flex: 1;
+    }
+
+    /* ── Cards ── */
+    .stat-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.5rem;
+      transition: border-color 0.2s;
+    }
+
+    .stat-card:hover { border-color: rgba(248,68,100,0.3); }
+
+    .stat-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.3rem;
+      margin-bottom: 1rem;
+    }
+
+    .stat-value {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 2.2rem;
+      letter-spacing: 1px;
+      color: #fff;
+      line-height: 1;
+    }
+
+    .stat-label {
+      font-size: 0.78rem;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-top: 0.25rem;
+    }
+
+    /* ── Table ── */
+    .dash-table {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+    }
+
+    .dash-table-head {
+      padding: 1.25rem 1.5rem;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .dash-table-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.1rem;
+      letter-spacing: 1.5px;
+      color: #fff;
+    }
+
+    table.admin-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    table.admin-table th {
+      background: var(--surface2);
+      color: var(--muted);
+      font-size: 0.72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      padding: 0.75rem 1.25rem;
+      text-align: left;
+      border-bottom: 1px solid var(--border);
+    }
+
+    table.admin-table td {
+      padding: 0.85rem 1.25rem;
+      font-size: 0.88rem;
+      border-bottom: 1px solid var(--border);
+      color: var(--text);
+      vertical-align: middle;
+    }
+
+    table.admin-table tr:last-child td { border-bottom: none; }
+
+    table.admin-table tr:hover td { background: rgba(255,255,255,0.02); }
+
+    /* ── Buttons ── */
+    .btn-red {
+      background: var(--red);
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      padding: 0.5rem 1.25rem;
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      transition: all 0.2s;
+    }
+
+    .btn-red:hover {
+      background: #d93558;
+      color: #fff;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 15px rgba(248,68,100,0.35);
+    }
+
+    .btn-ghost {
+      background: transparent;
+      color: var(--text);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 0.45rem 1rem;
+      font-size: 0.82rem;
+      font-weight: 500;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      transition: all 0.2s;
+    }
+
+    .btn-ghost:hover {
+      border-color: var(--red);
+      color: var(--red);
+    }
+
+    .btn-danger-sm {
+      background: rgba(248,68,100,0.1);
+      color: var(--red);
+      border: 1px solid rgba(248,68,100,0.25);
+      border-radius: 6px;
+      padding: 0.3rem 0.75rem;
+      font-size: 0.78rem;
+      cursor: pointer;
+      text-decoration: none;
+      transition: all 0.15s;
+    }
+
+    .btn-danger-sm:hover {
+      background: var(--red);
+      color: #fff;
+    }
+
+    .btn-edit-sm {
+      background: rgba(96,165,250,0.1);
+      color: #60a5fa;
+      border: 1px solid rgba(96,165,250,0.25);
+      border-radius: 6px;
+      padding: 0.3rem 0.75rem;
+      font-size: 0.78rem;
+      cursor: pointer;
+      text-decoration: none;
+      transition: all 0.15s;
+    }
+
+    .btn-edit-sm:hover {
+      background: #60a5fa;
+      color: #000;
+    }
+
+    /* ── Form ── */
+    .form-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 2rem;
+      max-width: 700px;
+    }
+
+    .form-card label {
+      font-size: 0.78rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--muted);
+      display: block;
+      margin-bottom: 0.4rem;
+    }
+
+    .form-card input,
+    .form-card select,
+    .form-card textarea {
+      width: 100%;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: #fff;
+      padding: 0.6rem 0.9rem;
+      font-size: 0.9rem;
+      font-family: 'DM Sans', sans-serif;
+      outline: none;
+      transition: border-color 0.2s;
+      margin-bottom: 1.25rem;
+    }
+
+    .form-card input:focus,
+    .form-card select:focus,
+    .form-card textarea:focus {
+      border-color: var(--red);
+    }
+
+    .form-card select option { background: var(--surface2); }
+
+    .form-card textarea { resize: vertical; min-height: 90px; }
+
+    .form-check-custom {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      margin-bottom: 1.25rem;
+    }
+
+    .form-check-custom input[type=checkbox] {
+      width: 18px;
+      height: 18px;
+      margin: 0;
+      accent-color: var(--red);
+    }
+
+    .form-check-custom label {
+      margin: 0;
+      font-size: 0.88rem;
+      text-transform: none;
+      letter-spacing: 0;
+      color: var(--text);
+    }
+
+    /* ── Badge ── */
+    .badge-active {
+      background: rgba(34,197,94,0.12);
+      color: #4ade80;
+      border: 1px solid rgba(34,197,94,0.3);
+      border-radius: 20px;
+      padding: 0.2rem 0.65rem;
+      font-size: 0.72rem;
+      font-weight: 700;
+    }
+
+    .badge-inactive {
+      background: rgba(248,68,100,0.1);
+      color: var(--red);
+      border: 1px solid rgba(248,68,100,0.25);
+      border-radius: 20px;
+      padding: 0.2rem 0.65rem;
+      font-size: 0.72rem;
+      font-weight: 700;
+    }
+
+    .badge-type {
+      background: rgba(96,165,250,0.1);
+      color: #60a5fa;
+      border: 1px solid rgba(96,165,250,0.2);
+      border-radius: 20px;
+      padding: 0.2rem 0.65rem;
+      font-size: 0.72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+
+    /* ── Page heading ── */
+    .page-heading {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 1.75rem;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+    }
+
+    .page-heading h1 {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.8rem;
+      letter-spacing: 2px;
+      color: #fff;
+    }
+
+    .page-heading p {
+      color: var(--muted);
+      font-size: 0.82rem;
+      margin: 0;
+    }
+
+    /* Scrollbar */
+    ::-webkit-scrollbar { width: 5px; }
+    ::-webkit-scrollbar-track { background: var(--bg); }
+    ::-webkit-scrollbar-thumb { background: #2a2a45; border-radius: 3px; }
+  </style>
+  {% block extra_css %}{% endblock %}
+</head>
+<body>
+
+<!-- Sidebar -->
+<aside class="sidebar">
+  <a href="{% url 'dashboard_home' %}" class="sidebar-brand">
+    <span class="logo">BookASeat</span>
+    <span class="sub">Admin Panel</span>
+  </a>
+
+  <div class="sidebar-section">
+    <div class="sidebar-label">Overview</div>
+    <a href="{% url 'dashboard_home' %}" class="sidebar-link {% if section == 'home' %}active{% endif %}">
+      <i class="bi bi-grid"></i> Dashboard
+    </a>
+    <a href="{% url 'dashboard_bookings' %}" class="sidebar-link {% if section == 'bookings' %}active{% endif %}">
+      <i class="bi bi-ticket-perforated"></i> Bookings
+    </a>
+    <a href="{% url 'dashboard_users' %}" class="sidebar-link {% if section == 'users' %}active{% endif %}">
+      <i class="bi bi-people"></i> Users
+    </a>
+  </div>
+
+  <div class="sidebar-section">
+    <div class="sidebar-label">Movies</div>
+    <a href="{% url 'dashboard_movies' %}" class="sidebar-link {% if section == 'movies' %}active{% endif %}">
+      <i class="bi bi-film"></i> Movies
+    </a>
+    <a href="{% url 'dashboard_shows' %}" class="sidebar-link {% if section == 'shows' %}active{% endif %}">
+      <i class="bi bi-camera-reels"></i> Shows
+    </a>
+    <a href="{% url 'dashboard_theatres' %}" class="sidebar-link {% if section == 'theatres' %}active{% endif %}">
+      <i class="bi bi-building"></i> Theatres
+    </a>
+  </div>
+
+  <div class="sidebar-section">
+    <div class="sidebar-label">Events</div>
+    <a href="{% url 'dashboard_events' %}" class="sidebar-link {% if section == 'events' %}active{% endif %}">
+      <i class="bi bi-calendar-event"></i> Events
+    </a>
+    <a href="{% url 'dashboard_venues' %}" class="sidebar-link {% if section == 'venues' %}active{% endif %}">
+      <i class="bi bi-geo-alt"></i> Venues
+    </a>
+  </div>
+
+  <div class="sidebar-footer">
+    <div>Logged in as <strong style="color:#fff;">{{ request.user.username }}</strong></div>
+    <a href="{% url 'movie_list' %}" style="color:var(--red); font-size:0.75rem;">← Back to site</a>
+  </div>
+</aside>
+
+<!-- Main -->
+<div class="main-wrap">
+  <div class="topbar">
+    <div class="topbar-title">{% block topbar_title %}Dashboard{% endblock %}</div>
+    <div class="topbar-right">
+      <div class="topbar-user">
+        <div class="topbar-avatar"><i class="bi bi-person"></i></div>
+        <span>{{ request.user.username }}</span>
+      </div>
+      <form method="post" action="{% url 'logout' %}" style="display:inline;">
+        {% csrf_token %}
+        <button type="submit" class="btn-ghost" style="cursor:pointer;">
+            <i class="bi bi-box-arrow-right"></i> Logout
+        </button>
+        </form>
+    </div>
+  </div>
+
+  <div class="page-content">
+    {% block content %}{% endblock %}
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+{% block extra_js %}{% endblock %}
+</body>
+</html>

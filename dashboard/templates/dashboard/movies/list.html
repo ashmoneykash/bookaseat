@@ -1,0 +1,62 @@
+{% extends 'dashboard/base.html' %}
+{% block title %}Movies — Admin{% endblock %}
+{% block topbar_title %}MOVIES{% endblock %}
+
+{% block content %}
+<div class="page-heading">
+  <div>
+    <h1>MOVIES</h1>
+    <p>{{ movies|length }} movie{{ movies|length|pluralize }} total</p>
+  </div>
+  <a href="{% url 'dashboard_movie_add' %}" class="btn-red">
+    <i class="bi bi-plus-circle"></i> Add Movie
+  </a>
+</div>
+
+<div class="dash-table">
+  <table class="admin-table">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Title</th>
+        <th>Language</th>
+        <th>Duration</th>
+        <th>Release Date</th>
+        <th>Status</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for movie in movies %}
+        <tr>
+          <td style="color:var(--muted);">#{{ movie.id }}</td>
+          <td style="font-weight:600; color:#fff;">{{ movie.title }}</td>
+          <td>{{ movie.language }}</td>
+          <td>{{ movie.duration }} min</td>
+          <td>{{ movie.release_date }}</td>
+          <td>
+            {% if movie.is_active %}
+              <span class="badge-active">Active</span>
+            {% else %}
+              <span class="badge-inactive">Inactive</span>
+            {% endif %}
+          </td>
+          <td>
+            <div style="display:flex; gap:0.5rem;">
+              <a href="{% url 'dashboard_movie_edit' movie.id %}" class="btn-edit-sm">
+                <i class="bi bi-pencil"></i> Edit
+              </a>
+              <form method="post" action="{% url 'dashboard_movie_delete' movie.id %}" style="display:inline;" onsubmit="return confirm('Delete {{ movie.title }}?')">
+                {% csrf_token %}
+                <button type="submit" class="btn-danger-sm"><i class="bi bi-trash"></i> Delete</button>
+              </form>
+            </div>
+          </td>
+        </tr>
+      {% empty %}
+        <tr><td colspan="7" style="color:var(--muted); text-align:center; padding:2rem;">No movies yet. <a href="{% url 'dashboard_movie_add' %}" style="color:var(--red);">Add one →</a></td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

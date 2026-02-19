@@ -1,0 +1,47 @@
+{% extends 'dashboard/base.html' %}
+{% block title %}Bookings — Admin{% endblock %}
+{% block topbar_title %}BOOKINGS{% endblock %}
+
+{% block content %}
+<div class="page-heading">
+  <div><h1>ALL BOOKINGS</h1><p>{{ bookings|length }} booking{{ bookings|length|pluralize }} total</p></div>
+</div>
+
+<div class="dash-table">
+  <table class="admin-table">
+    <thead>
+      <tr><th>#</th><th>User</th><th>Movie</th><th>Theatre</th><th>Date</th><th>Seats</th><th>Status</th><th>Booked At</th></tr>
+    </thead>
+    <tbody>
+      {% for booking in bookings %}
+        <tr>
+          <td style="color:var(--muted);">#{{ booking.id }}</td>
+          <td style="color:#fff; font-weight:500;">{{ booking.user.username }}</td>
+          <td>{{ booking.show.movie.title }}</td>
+          <td>{{ booking.show.theatre.name }}</td>
+          <td>{{ booking.show.show_date }}</td>
+          <td>
+            {% for seat in booking.seats.all %}
+              <span style="background:rgba(248,68,100,0.1); color:#f84464; border-radius:4px; padding:0.1rem 0.4rem; font-size:0.72rem; font-weight:700; margin:0.1rem; display:inline-block;">
+                {{ seat.row }}{{ seat.seat_number }}
+              </span>
+            {% endfor %}
+          </td>
+          <td>
+            {% if booking.status == 'CONFIRMED' %}
+              <span class="badge-active">{{ booking.status }}</span>
+            {% elif booking.status == 'CANCELLED' %}
+              <span class="badge-inactive">{{ booking.status }}</span>
+            {% else %}
+              <span style="color:var(--muted); font-size:0.78rem;">{{ booking.status }}</span>
+            {% endif %}
+          </td>
+          <td style="color:var(--muted); font-size:0.8rem;">{{ booking.created_at|date:"d M Y, H:i" }}</td>
+        </tr>
+      {% empty %}
+        <tr><td colspan="8" style="color:var(--muted); text-align:center; padding:2rem;">No bookings yet.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

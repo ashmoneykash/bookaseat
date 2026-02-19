@@ -1,0 +1,81 @@
+{% extends 'dashboard/base.html' %}
+{% block title %}{{ action }} Event — Admin{% endblock %}
+{% block topbar_title %}{{ action|upper }} EVENT{% endblock %}
+
+{% block content %}
+<div class="page-heading">
+  <div><h1>{{ action|upper }} EVENT</h1></div>
+  <a href="{% url 'dashboard_events' %}" class="btn-ghost"><i class="bi bi-arrow-left"></i> Back</a>
+</div>
+
+<div class="form-card">
+  <form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    <div class="row g-3">
+      <div class="col-md-8">
+        <label>Event Title</label>
+        <input type="text" name="title" value="{{ event.title|default:'' }}" required placeholder="e.g. Coldplay World Tour" />
+      </div>
+      <div class="col-md-4">
+        <label>Event Type</label>
+        <select name="event_type" required>
+          {% for val, label in event_types %}
+            <option value="{{ val }}" {% if event.event_type == val %}selected{% endif %}>{{ label }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="col-md-6">
+        <label>Venue</label>
+        <select name="venue">
+          <option value="">— No venue / TBD —</option>
+          {% for venue in venues %}
+            <option value="{{ venue.id }}" {% if event.venue_id == venue.id %}selected{% endif %}>{{ venue.name }} — {{ venue.city }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="col-md-6">
+        <label>Language (optional)</label>
+        <input type="text" name="language" value="{{ event.language|default:'' }}" placeholder="e.g. English, Hindi" />
+      </div>
+      <div class="col-md-6">
+        <label>Event Date</label>
+        <input type="date" name="event_date" value="{{ event.event_date|date:'Y-m-d'|default:'' }}" required />
+      </div>
+      <div class="col-md-6">
+        <label>Event Time</label>
+        <input type="time" name="event_time" value="{{ event.event_time|default:'' }}" required />
+      </div>
+      <div class="col-md-6">
+        <label>Ticket Price (₹)</label>
+        <input type="number" name="price" step="0.01" value="{{ event.price|default:'' }}" required placeholder="e.g. 999.00" />
+      </div>
+      <div class="col-md-6">
+        <label>Total Seats</label>
+        <input type="number" name="total_seats" value="{{ event.total_seats|default:'' }}" required placeholder="e.g. 500" />
+      </div>
+      <div class="col-12">
+        <label>Poster Image</label>
+        <input type="file" name="poster" accept="image/*" />
+        {% if event.poster %}
+          <div style="margin-top:0.5rem; font-size:0.78rem; color:var(--muted);">Current: {{ event.poster.name }}</div>
+        {% endif %}
+      </div>
+      <div class="col-12">
+        <label>Description</label>
+        <textarea name="description" placeholder="Event details...">{{ event.description|default:'' }}</textarea>
+      </div>
+      <div class="col-12">
+        <div class="form-check-custom">
+          <input type="checkbox" name="is_active" id="is_active" {% if event.is_active or not event %}checked{% endif %} />
+          <label for="is_active">Active (visible on site)</label>
+        </div>
+      </div>
+    </div>
+
+    <div style="display:flex; gap:0.75rem; margin-top:0.5rem;">
+      <button type="submit" class="btn-red"><i class="bi bi-check-circle"></i> {{ action }} Event</button>
+      <a href="{% url 'dashboard_events' %}" class="btn-ghost">Cancel</a>
+    </div>
+  </form>
+</div>
+{% endblock %}

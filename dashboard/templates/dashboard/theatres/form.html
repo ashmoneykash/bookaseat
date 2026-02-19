@@ -1,0 +1,38 @@
+{% extends 'dashboard/base.html' %}
+{% block title %}{{ action }} Theatre — Admin{% endblock %}
+{% block topbar_title %}{{ action|upper }} THEATRE{% endblock %}
+
+{% block content %}
+<div class="page-heading">
+  <div><h1>{{ action|upper }} THEATRE</h1></div>
+  <a href="{% url 'dashboard_theatres' %}" class="btn-ghost"><i class="bi bi-arrow-left"></i> Back</a>
+</div>
+
+<div class="form-card">
+  <form method="post">
+    {% csrf_token %}
+    <div class="row g-3">
+      <div class="col-md-8">
+        <label>Theatre Name</label>
+        <input type="text" name="name" value="{{ theatre.name|default:'' }}" required placeholder="e.g. PVR Cinemas" />
+      </div>
+      <div class="col-md-4">
+        <label>City</label>
+        <input type="text" name="city" value="{{ theatre.city|default:'' }}" required placeholder="e.g. Mumbai" />
+      </div>
+      <div class="col-md-8">
+        <label>Address</label>
+        <textarea name="address" placeholder="Full address...">{{ theatre.address|default:'' }}</textarea>
+      </div>
+      <div class="col-md-4">
+        <label>Total Screens</label>
+        <input type="number" name="total_screens" value="{{ theatre.total_screens|default:'1' }}" min="1" />
+      </div>
+    </div>
+    <div style="display:flex; gap:0.75rem; margin-top:0.5rem;">
+      <button type="submit" class="btn-red"><i class="bi bi-check-circle"></i> {{ action }} Theatre</button>
+      <a href="{% url 'dashboard_theatres' %}" class="btn-ghost">Cancel</a>
+    </div>
+  </form>
+</div>
+{% endblock %}

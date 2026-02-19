@@ -1,0 +1,64 @@
+{% extends 'dashboard/base.html' %}
+{% block title %}{{ action }} Show — Admin{% endblock %}
+{% block topbar_title %}{{ action|upper }} SHOW{% endblock %}
+
+{% block content %}
+<div class="page-heading">
+  <div>
+    <h1>{{ action|upper }} SHOW</h1>
+    <p>Seats are auto-generated from the total count.</p>
+  </div>
+  <a href="{% url 'dashboard_shows' %}" class="btn-ghost">
+    <i class="bi bi-arrow-left"></i> Back
+  </a>
+</div>
+
+<div class="form-card">
+  <form method="post">
+    {% csrf_token %}
+    <div class="row g-3">
+      <div class="col-md-6">
+        <label>Movie</label>
+        <select name="movie" required>
+          <option value="">— Select Movie —</option>
+          {% for movie in movies %}
+            <option value="{{ movie.id }}" {% if show.movie_id == movie.id %}selected{% endif %}>{{ movie.title }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="col-md-6">
+        <label>Theatre</label>
+        <select name="theatre" required>
+          <option value="">— Select Theatre —</option>
+          {% for theatre in theatres %}
+            <option value="{{ theatre.id }}" {% if show.theatre_id == theatre.id %}selected{% endif %}>{{ theatre.name }} — {{ theatre.city }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="col-md-6">
+        <label>Show Date</label>
+        <input type="date" name="show_date" value="{{ show.show_date|date:'Y-m-d'|default:'' }}" required />
+      </div>
+      <div class="col-md-6">
+        <label>Show Time</label>
+        <input type="time" name="show_time" value="{{ show.show_time|default:'' }}" required />
+      </div>
+      <div class="col-md-6">
+        <label>Ticket Price (₹)</label>
+        <input type="number" name="price" step="0.01" value="{{ show.price|default:'' }}" required placeholder="e.g. 250.00" />
+      </div>
+      <div class="col-md-6">
+        <label>Total Seats {% if show %}(cannot change after creation){% endif %}</label>
+        <input type="number" name="total_seats" value="{{ show.total_seats|default:'' }}" {% if show %}readonly{% else %}required{% endif %} placeholder="e.g. 50" />
+      </div>
+    </div>
+
+    <div style="display:flex; gap:0.75rem; margin-top:1.25rem;">
+      <button type="submit" class="btn-red">
+        <i class="bi bi-check-circle"></i> {{ action }} Show
+      </button>
+      <a href="{% url 'dashboard_shows' %}" class="btn-ghost">Cancel</a>
+    </div>
+  </form>
+</div>
+{% endblock %}

@@ -1,22 +1,254 @@
-{% extends "base.html" %}
+{% extends 'base.html' %}
 
-{% block title %}Payment Successful{% endblock %}
+{% block title %}Booking Confirmed — BookASeat{% endblock %}
+
+{% block extra_css %}
+<style>
+  .success-wrapper {
+    max-width: 600px;
+    margin: 2rem auto;
+  }
+
+  .success-icon-wrap { text-align: center; margin-bottom: 2rem; }
+
+  .success-checkmark {
+    width: 90px;
+    height: 90px;
+    border-radius: 50%;
+    background: rgba(34,197,94,0.1);
+    border: 2px solid rgba(34,197,94,0.4);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2.5rem;
+    color: #4ade80;
+    animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) both;
+  }
+
+  @keyframes popIn {
+    0% { transform: scale(0); opacity: 0; }
+    100% { transform: scale(1); opacity: 1; }
+  }
+
+  .success-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 2.4rem;
+    letter-spacing: 2px;
+    color: #fff;
+    text-align: center;
+    margin: 1rem 0 0.4rem;
+  }
+
+  .success-subtitle {
+    text-align: center;
+    color: var(--bms-muted);
+    font-size: 0.92rem;
+    margin-bottom: 2.5rem;
+  }
+
+  .ticket-card {
+    background: var(--bms-card-bg);
+    border: 1px solid var(--bms-border);
+    border-radius: 16px;
+    overflow: hidden;
+    position: relative;
+  }
+
+  .ticket-top {
+    background: linear-gradient(135deg, #1a0a0f 0%, #0f3460 100%);
+    padding: 1.5rem 2rem;
+    border-bottom: 2px dashed rgba(255,255,255,0.1);
+    position: relative;
+  }
+
+  .ticket-top::before,
+  .ticket-top::after {
+    content: '';
+    position: absolute;
+    bottom: -14px;
+    width: 26px;
+    height: 26px;
+    background: #0d0d1a;
+    border-radius: 50%;
+    border: 1px solid var(--bms-border);
+  }
+
+  .ticket-top::before { left: -13px; }
+  .ticket-top::after { right: -13px; }
+
+  .ticket-movie-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 2rem;
+    letter-spacing: 2px;
+    color: #fff;
+    margin-bottom: 0.25rem;
+  }
+
+  .ticket-bottom { padding: 1.75rem 2rem; }
+
+  .ticket-detail-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.25rem;
+  }
+
+  .ticket-detail-item label {
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--bms-muted);
+    display: block;
+    margin-bottom: 0.2rem;
+  }
+
+  .ticket-detail-item span {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: #fff;
+  }
+
+  .ticket-seats { grid-column: 1 / -1; }
+
+  .seat-tag {
+    display: inline-block;
+    background: rgba(248,68,100,0.12);
+    border: 1px solid rgba(248,68,100,0.3);
+    color: var(--bms-red);
+    border-radius: 6px;
+    padding: 0.2rem 0.65rem;
+    font-size: 0.78rem;
+    font-weight: 700;
+    margin: 0.2rem;
+    letter-spacing: 0.5px;
+  }
+
+  .booking-id-section {
+    border-top: 1px solid var(--bms-border);
+    padding-top: 1.25rem;
+    margin-top: 1.25rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .booking-id-label {
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--bms-muted);
+    margin-bottom: 0.2rem;
+  }
+
+  .booking-id-value {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.3rem;
+    letter-spacing: 2px;
+    color: var(--bms-red);
+  }
+
+  .total-amount { text-align: right; }
+
+  .total-amount label {
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--bms-muted);
+    display: block;
+    margin-bottom: 0.2rem;
+  }
+
+  .total-amount .amount {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.8rem;
+    letter-spacing: 2px;
+    color: #4ade80;
+  }
+
+  .action-buttons {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    margin-top: 2rem;
+    flex-wrap: wrap;
+  }
+</style>
+{% endblock %}
 
 {% block content %}
-<div class="d-flex justify-content-center align-items-center" style="min-height: 70vh;">
-    <div class="card shadow text-center p-5" style="max-width: 450px;">
-        <div class="mb-4">
-            <span class="display-1 text-success">✓</span>
+<div class="success-wrapper">
+
+  <div class="success-icon-wrap">
+    <div class="success-checkmark">
+      <i class="bi bi-check-lg"></i>
+    </div>
+  </div>
+
+  <div class="success-title">BOOKING CONFIRMED!</div>
+  <p class="success-subtitle">
+    <i class="bi bi-check-circle me-1" style="color:#4ade80;"></i>
+    Your seats have been reserved successfully.
+  </p>
+
+  <div class="ticket-card">
+    <div class="ticket-top">
+      <div class="ticket-movie-title">{{ payment.booking.show.movie.title }}</div>
+      <div style="color:var(--bms-muted); font-size:0.82rem;">
+        {{ payment.booking.show.theatre.name }}
+      </div>
+    </div>
+
+    <div class="ticket-bottom">
+      <div class="ticket-detail-grid">
+        <div class="ticket-detail-item">
+          <label><i class="bi bi-calendar3 me-1"></i>Date</label>
+          <span>{{ payment.booking.show.show_date }}</span>
+        </div>
+        <div class="ticket-detail-item">
+          <label><i class="bi bi-clock me-1"></i>Time</label>
+          <span>{{ payment.booking.show.show_time }}</span>
+        </div>
+        <div class="ticket-detail-item">
+          <label><i class="bi bi-geo-alt me-1"></i>Theatre</label>
+          <span>{{ payment.booking.show.theatre.name }}</span>
+        </div>
+        <div class="ticket-detail-item">
+          <label><i class="bi bi-person me-1"></i>Booked By</label>
+          <span>{{ payment.booking.user.username }}</span>
         </div>
 
-        <h3 class="mb-3">Payment Successful</h3>
-        <p class="text-muted mb-4">
-            Your booking has been confirmed successfully.
-        </p>
+        {% if payment.booking.seats.all %}
+          <div class="ticket-detail-item ticket-seats">
+            <label><i class="bi bi-grid me-1"></i>Seats</label>
+            <div class="mt-1">
+              {% for seat in payment.booking.seats.all %}
+                <span class="seat-tag">{{ seat.row }}{{ seat.seat_number }}</span>
+              {% endfor %}
+            </div>
+          </div>
+        {% endif %}
+      </div>
 
-        <a href="/movies/" class="btn btn-primary px-4">
-            Back to Movies
-        </a>
+      <div class="booking-id-section">
+        <div>
+          <div class="booking-id-label">Booking Reference</div>
+          <div class="booking-id-value">#{{ payment.booking.id }}</div>
+        </div>
+        <div class="total-amount">
+          <label>Amount Paid</label>
+          <div class="amount">₹{{ payment.amount }}</div>
+        </div>
+      </div>
     </div>
+  </div>
+
+  <div class="action-buttons">
+    <a href="{% url 'movie_list' %}" class="btn btn-bms-primary px-4">
+      <i class="bi bi-film me-2"></i>Browse More Movies
+    </a>
+    <a href="{% url 'my_bookings' %}" class="btn btn-bms-outline px-4">
+      <i class="bi bi-ticket-perforated me-2"></i>My Bookings
+    </a>
+  </div>
+
 </div>
 {% endblock %}

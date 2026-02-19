@@ -1,0 +1,130 @@
+{% extends 'dashboard/base.html' %}
+{% block title %}Dashboard — BookASeat Admin{% endblock %}
+{% block topbar_title %}DASHBOARD{% endblock %}
+
+{% block content %}
+<div class="page-heading">
+  <div>
+    <h1>OVERVIEW</h1>
+    <p>Welcome back, {{ request.user.username }}. Here's what's happening.</p>
+  </div>
+</div>
+
+<!-- Stat Cards -->
+<div class="row g-3 mb-4">
+  <div class="col-6 col-lg-3">
+    <div class="stat-card">
+      <div class="stat-icon" style="background:rgba(248,68,100,0.12);">
+        <i class="bi bi-film" style="color:#f84464;"></i>
+      </div>
+      <div class="stat-value">{{ total_movies }}</div>
+      <div class="stat-label">Movies</div>
+    </div>
+  </div>
+  <div class="col-6 col-lg-3">
+    <div class="stat-card">
+      <div class="stat-icon" style="background:rgba(96,165,250,0.12);">
+        <i class="bi bi-camera-reels" style="color:#60a5fa;"></i>
+      </div>
+      <div class="stat-value">{{ total_shows }}</div>
+      <div class="stat-label">Shows</div>
+    </div>
+  </div>
+  <div class="col-6 col-lg-3">
+    <div class="stat-card">
+      <div class="stat-icon" style="background:rgba(251,191,36,0.12);">
+        <i class="bi bi-calendar-event" style="color:#fbbf24;"></i>
+      </div>
+      <div class="stat-value">{{ total_events }}</div>
+      <div class="stat-label">Events</div>
+    </div>
+  </div>
+  <div class="col-6 col-lg-3">
+    <div class="stat-card">
+      <div class="stat-icon" style="background:rgba(34,197,94,0.12);">
+        <i class="bi bi-ticket-perforated" style="color:#4ade80;"></i>
+      </div>
+      <div class="stat-value">{{ confirmed_bookings }}</div>
+      <div class="stat-label">Confirmed Bookings</div>
+    </div>
+  </div>
+  <div class="col-6 col-lg-3">
+    <div class="stat-card">
+      <div class="stat-icon" style="background:rgba(167,139,250,0.12);">
+        <i class="bi bi-people" style="color:#a78bfa;"></i>
+      </div>
+      <div class="stat-value">{{ total_users }}</div>
+      <div class="stat-label">Users</div>
+    </div>
+  </div>
+  <div class="col-6 col-lg-3">
+    <div class="stat-card">
+      <div class="stat-icon" style="background:rgba(34,197,94,0.12);">
+        <i class="bi bi-currency-rupee" style="color:#4ade80;"></i>
+      </div>
+      <div class="stat-value">₹{{ revenue|floatformat:0 }}</div>
+      <div class="stat-label">Revenue</div>
+    </div>
+  </div>
+</div>
+
+<!-- Quick Actions -->
+<div class="row g-3 mb-4">
+  <div class="col-12">
+    <div class="dash-table">
+      <div class="dash-table-head">
+        <span class="dash-table-title">QUICK ACTIONS</span>
+      </div>
+      <div style="padding:1.25rem; display:flex; gap:0.75rem; flex-wrap:wrap;">
+        <a href="{% url 'dashboard_movie_add' %}" class="btn-red"><i class="bi bi-plus-circle"></i> Add Movie</a>
+        <a href="{% url 'dashboard_show_add' %}" class="btn-red"><i class="bi bi-plus-circle"></i> Add Show</a>
+        <a href="{% url 'dashboard_theatre_add' %}" class="btn-ghost"><i class="bi bi-plus-circle"></i> Add Theatre</a>
+        <a href="{% url 'dashboard_event_add' %}" class="btn-ghost"><i class="bi bi-plus-circle"></i> Add Event</a>
+        <a href="{% url 'dashboard_venue_add' %}" class="btn-ghost"><i class="bi bi-plus-circle"></i> Add Venue</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Recent Bookings -->
+<div class="dash-table">
+  <div class="dash-table-head">
+    <span class="dash-table-title">RECENT BOOKINGS</span>
+    <a href="{% url 'dashboard_bookings' %}" class="btn-ghost" style="font-size:0.78rem; padding:0.3rem 0.8rem;">
+      View All <i class="bi bi-arrow-right ms-1"></i>
+    </a>
+  </div>
+  <table class="admin-table">
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>User</th>
+        <th>Movie</th>
+        <th>Show Date</th>
+        <th>Theatre</th>
+        <th>Status</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for booking in recent_bookings %}
+        <tr>
+          <td style="color:var(--muted);">#{{ booking.id }}</td>
+          <td>{{ booking.user.username }}</td>
+          <td>{{ booking.show.movie.title }}</td>
+          <td>{{ booking.show.show_date }}</td>
+          <td>{{ booking.show.theatre.name }}</td>
+          <td>
+            {% if booking.status == 'CONFIRMED' %}
+              <span class="badge-active">{{ booking.status }}</span>
+            {% else %}
+              <span class="badge-inactive">{{ booking.status }}</span>
+            {% endif %}
+          </td>
+        </tr>
+      {% empty %}
+        <tr><td colspan="6" style="color:var(--muted); text-align:center; padding:2rem;">No bookings yet.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

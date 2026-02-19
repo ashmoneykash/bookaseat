@@ -1,0 +1,89 @@
+{% extends 'base.html' %}
+{% block title %}{{ event.title }} — BookASeat{% endblock %}
+
+{% block extra_css %}
+<style>
+  .detail-poster { width: 100%; border-radius: 12px; object-fit: cover; box-shadow: 0 8px 40px rgba(0,0,0,0.6); aspect-ratio: 2/3; }
+  .poster-placeholder { width: 100%; aspect-ratio: 2/3; border-radius: 12px; background: linear-gradient(135deg, #1a1a2e 0%, #0f3460 100%); display: flex; align-items: center; justify-content: center; color: var(--bms-muted); font-size: 5rem; }
+  .event-title { font-family: 'Bebas Neue', sans-serif; font-size: 2.8rem; letter-spacing: 2px; color: #fff; line-height: 1.1; margin-bottom: 1rem; }
+  .meta-chip { display: inline-flex; align-items: center; gap: 0.4rem; background: rgba(255,255,255,0.06); border: 1px solid var(--bms-border); border-radius: 6px; padding: 0.3rem 0.75rem; font-size: 0.82rem; color: var(--bms-text); margin-right: 0.5rem; margin-bottom: 0.5rem; }
+  .meta-chip i { color: var(--bms-red); }
+  .desc-text { color: var(--bms-muted); line-height: 1.7; font-size: 0.95rem; }
+  .book-card { background: var(--bms-card-bg); border: 1px solid var(--bms-border); border-radius: 12px; padding: 1.5rem; margin-top: 1.5rem; }
+  .price-big { font-family: 'Bebas Neue', sans-serif; font-size: 2rem; letter-spacing: 2px; color: #4ade80; }
+  .breadcrumb-bms a { color: var(--bms-muted); text-decoration: none; font-size: 0.85rem; }
+  .breadcrumb-bms a:hover { color: var(--bms-red); }
+  .breadcrumb-bms span { color: var(--bms-muted); font-size: 0.85rem; }
+  .type-badge { font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; padding: 0.25rem 0.75rem; border-radius: 20px; display: inline-block; margin-bottom: 0.75rem; }
+  .type-concert { background: rgba(167,139,250,0.15); color: #a78bfa; border: 1px solid rgba(167,139,250,0.3); }
+  .type-sport   { background: rgba(251,191,36,0.15);  color: #fbbf24; border: 1px solid rgba(251,191,36,0.3); }
+  .type-comedy  { background: rgba(251,146,60,0.15);  color: #fb923c; border: 1px solid rgba(251,146,60,0.3); }
+  .type-theatre { background: rgba(52,211,153,0.15);  color: #34d399; border: 1px solid rgba(34,197,94,0.3); }
+  .type-festival{ background: rgba(96,165,250,0.15);  color: #60a5fa; border: 1px solid rgba(96,165,250,0.3); }
+  .type-other   { background: rgba(148,163,184,0.1);  color: #94a3b8; border: 1px solid rgba(148,163,184,0.2); }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="breadcrumb-bms mb-3">
+  <a href="{% url 'movie_list' %}"><i class="bi bi-house me-1"></i>Home</a>
+  <span class="mx-2">/</span>
+  <a href="{% url 'event_list' %}">Events</a>
+  <span class="mx-2">/</span>
+  <span style="color:var(--bms-text);">{{ event.title }}</span>
+</div>
+
+<div class="row g-4">
+  <div class="col-md-3">
+    {% if event.poster %}
+      <img src="{{ event.poster.url }}" alt="{{ event.title }}" class="detail-poster" />
+    {% else %}
+      <div class="poster-placeholder">
+        {% if event.event_type == 'concert' %}<i class="bi bi-music-note-beamed"></i>
+        {% elif event.event_type == 'sport' %}<i class="bi bi-trophy"></i>
+        {% elif event.event_type == 'comedy' %}<i class="bi bi-emoji-laughing"></i>
+        {% elif event.event_type == 'theatre' %}<i class="bi bi-mask"></i>
+        {% else %}<i class="bi bi-calendar-event"></i>{% endif %}
+      </div>
+    {% endif %}
+  </div>
+
+  <div class="col-md-9">
+    <span class="type-badge type-{{ event.event_type }}">{{ event.get_event_type_display }}</span>
+    <div class="event-title">{{ event.title }}</div>
+
+    <div class="mb-3">
+      <span class="meta-chip"><i class="bi bi-calendar3"></i>{{ event.event_date }}</span>
+      <span class="meta-chip"><i class="bi bi-clock"></i>{{ event.event_time }}</span>
+      {% if event.venue %}
+        <span class="meta-chip"><i class="bi bi-geo-alt"></i>{{ event.venue.name }}, {{ event.venue.city }}</span>
+      {% endif %}
+      {% if event.language %}
+        <span class="meta-chip"><i class="bi bi-translate"></i>{{ event.language }}</span>
+      {% endif %}
+      <span class="meta-chip"><i class="bi bi-people"></i>{{ event.available_seats }} seats left</span>
+    </div>
+
+    {% if event.description %}
+      <p class="desc-text">{{ event.description }}</p>
+    {% endif %}
+
+    <div class="book-card">
+      <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:1rem;">
+        <div>
+          <div style="font-size:0.72rem; text-transform:uppercase; letter-spacing:1px; color:var(--bms-muted); margin-bottom:0.2rem;">Price</div>
+          <div class="price-big">₹{{ event.price }}</div>
+          <div style="font-size:0.78rem; color:var(--bms-muted);">per person</div>
+        </div>
+        {% if event.available_seats > 0 %}
+          <a href="#" class="btn btn-bms-primary px-5 py-2" style="font-size:1rem;">
+            <i class="bi bi-ticket-perforated me-2"></i>Book Tickets
+          </a>
+        {% else %}
+          <button class="btn btn-bms-primary px-5 py-2" disabled style="opacity:0.5;">Sold Out</button>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

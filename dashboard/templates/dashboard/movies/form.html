@@ -1,0 +1,66 @@
+{% extends 'dashboard/base.html' %}
+{% block title %}{{ action }} Movie — Admin{% endblock %}
+{% block topbar_title %}{{ action|upper }} MOVIE{% endblock %}
+
+{% block content %}
+<div class="page-heading">
+  <div>
+    <h1>{{ action|upper }} MOVIE</h1>
+    <p>{% if movie %}Editing: {{ movie.title }}{% else %}Fill in the details below{% endif %}</p>
+  </div>
+  <a href="{% url 'dashboard_movies' %}" class="btn-ghost">
+    <i class="bi bi-arrow-left"></i> Back
+  </a>
+</div>
+
+<div class="form-card">
+  <form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+
+    <div class="row g-3">
+      <div class="col-12">
+        <label>Title</label>
+        <input type="text" name="title" value="{{ movie.title|default:'' }}" required placeholder="e.g. Avengers: Endgame" />
+      </div>
+      <div class="col-md-6">
+        <label>Language</label>
+        <input type="text" name="language" value="{{ movie.language|default:'' }}" required placeholder="e.g. English, Hindi" />
+      </div>
+      <div class="col-md-6">
+        <label>Duration (minutes)</label>
+        <input type="number" name="duration" value="{{ movie.duration|default:'' }}" required placeholder="e.g. 120" />
+      </div>
+      <div class="col-md-6">
+        <label>Release Date</label>
+        <input type="date" name="release_date" value="{{ movie.release_date|date:'Y-m-d'|default:'' }}" required />
+      </div>
+      <div class="col-md-6">
+        <label>Poster Image</label>
+        <input type="file" name="poster" accept="image/*" />
+        {% if movie.poster %}
+          <div style="margin-top:0.5rem; font-size:0.78rem; color:var(--muted);">
+            Current: {{ movie.poster.name }}
+          </div>
+        {% endif %}
+      </div>
+      <div class="col-12">
+        <label>Description</label>
+        <textarea name="description" placeholder="Movie synopsis...">{{ movie.description|default:'' }}</textarea>
+      </div>
+      <div class="col-12">
+        <div class="form-check-custom">
+          <input type="checkbox" name="is_active" id="is_active" {% if movie.is_active or not movie %}checked{% endif %} />
+          <label for="is_active">Active (visible on site)</label>
+        </div>
+      </div>
+    </div>
+
+    <div style="display:flex; gap:0.75rem; margin-top:0.5rem;">
+      <button type="submit" class="btn-red">
+        <i class="bi bi-check-circle"></i> {{ action }} Movie
+      </button>
+      <a href="{% url 'dashboard_movies' %}" class="btn-ghost">Cancel</a>
+    </div>
+  </form>
+</div>
+{% endblock %}

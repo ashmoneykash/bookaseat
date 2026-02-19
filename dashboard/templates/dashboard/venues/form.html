@@ -1,0 +1,38 @@
+{% extends 'dashboard/base.html' %}
+{% block title %}{{ action }} Venue — Admin{% endblock %}
+{% block topbar_title %}{{ action|upper }} VENUE{% endblock %}
+
+{% block content %}
+<div class="page-heading">
+  <div><h1>{{ action|upper }} VENUE</h1></div>
+  <a href="{% url 'dashboard_venues' %}" class="btn-ghost"><i class="bi bi-arrow-left"></i> Back</a>
+</div>
+
+<div class="form-card">
+  <form method="post">
+    {% csrf_token %}
+    <div class="row g-3">
+      <div class="col-md-8">
+        <label>Venue Name</label>
+        <input type="text" name="name" value="{{ venue.name|default:'' }}" required placeholder="e.g. DY Patil Stadium" />
+      </div>
+      <div class="col-md-4">
+        <label>City</label>
+        <input type="text" name="city" value="{{ venue.city|default:'' }}" required placeholder="e.g. Mumbai" />
+      </div>
+      <div class="col-md-8">
+        <label>Address</label>
+        <textarea name="address" placeholder="Full address...">{{ venue.address|default:'' }}</textarea>
+      </div>
+      <div class="col-md-4">
+        <label>Capacity</label>
+        <input type="number" name="capacity" value="{{ venue.capacity|default:'' }}" placeholder="e.g. 10000" />
+      </div>
+    </div>
+    <div style="display:flex; gap:0.75rem; margin-top:0.5rem;">
+      <button type="submit" class="btn-red"><i class="bi bi-check-circle"></i> {{ action }} Venue</button>
+      <a href="{% url 'dashboard_venues' %}" class="btn-ghost">Cancel</a>
+    </div>
+  </form>
+</div>
+{% endblock %}

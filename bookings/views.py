@@ -58,3 +58,11 @@ def book_show(request, show_id):
         'show': show,
         'seats': seats
     })
+
+
+@login_required
+def my_bookings(request):
+    bookings = Booking.objects.filter(user=request.user).select_related(
+        'show', 'show__movie'
+    ).prefetch_related('seats').order_by('-id')
+    return render(request, 'bookings/my_bookings.html', {'bookings': bookings})
