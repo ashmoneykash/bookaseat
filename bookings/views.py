@@ -4,7 +4,7 @@ from django.db.models import IntegerField
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from movies.models import Show
-from .models import Seat, Booking
+from .models import Seat, Booking, EventBooking
 
 @login_required
 def book_show(request, show_id):
@@ -66,7 +66,15 @@ def book_show(request, show_id):
 
 @login_required
 def my_bookings(request):
-    bookings = Booking.objects.filter(user=request.user).select_related(
-        'show', 'show__movie'
+    movie_bookings = Booking.objects.filter(user=request.user).select_related(
+        'show', 'show__movie', 'show__theatre'
     ).prefetch_related('seats').order_by('-id')
-    return render(request, 'bookings/my_bookings.html', {'bookings': bookings})
+
+    event_bookings = EventBooking.objects.filter(user=request.user).select_related(
+        'event', 'event__venue'
+    ).order_by('-id')
+
+    return render(request, 'bookings/my_bookings.html', {
+        'movie_bookings': movie_bookings,
+        'event_bookings': event_bookings,
+    })
