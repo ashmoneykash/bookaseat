@@ -2,8 +2,6 @@
 
 {% block extra_css %}
 <style>
-/* === My Bookings Table Styling === */
-
 .table-card {
     margin-top: 20px;
     background: rgba(255, 255, 255, 0.02);
@@ -31,17 +29,8 @@
     vertical-align: middle;
 }
 
-.title-cell {
-    font-weight: 600;
-    font-size: 15px;
-}
-
-.title-cell span {
-    display: block;
-    font-size: 12px;
-    color: #9aa0b5;
-    margin-top: 4px;
-}
+.title-cell { font-weight: 600; font-size: 15px; }
+.title-cell span { display: block; font-size: 12px; color: #9aa0b5; margin-top: 4px; }
 
 .status-pill {
     padding: 6px 16px;
@@ -50,36 +39,104 @@
     font-weight: 600;
     display: inline-block;
 }
+.status-pill.confirmed { background: rgba(0,200,100,0.15); color: #3ddc84; }
 
-.status-pill.confirmed {
-    background: rgba(0, 200, 100, 0.15);
-    color: #3ddc84;
+.section-title { margin-top: 60px; margin-bottom: 24px; font-size: 26px; font-weight: 600; }
+.section-title.red { color: var(--bms-red); }
+
+.empty-state {
+    text-align: center;
+    padding: 3.5rem 1rem;
+    background: rgba(255,255,255,0.02);
+    border: 1px dashed rgba(255,255,255,0.08);
+    border-radius: 14px;
+    margin-top: 20px;
+}
+.empty-state i { font-size: 3rem; color: rgba(248,68,100,0.25); display: block; margin-bottom: 1rem; }
+.empty-state p { color: #8b8fa3; font-size: 0.92rem; margin-bottom: 1.25rem; }
+
+.full-empty { text-align: center; padding: 5rem 1rem; }
+.full-empty i { font-size: 5rem; color: rgba(248,68,100,0.15); display: block; margin-bottom: 1.5rem; }
+.full-empty p { color: #8b8fa3; font-size: 1rem; margin-bottom: 1.5rem; }
+
+/* Button row — use flex on the wrapper to control sizing */
+.browse-btn-row {
+    display: flex;
+    gap: 0.75rem;
+    justify-content: center;
+    flex-wrap: wrap;
 }
 
-/* Section headings */
-.section-title {
-    margin-top: 60px;   /* space between sections */
-    margin-bottom: 24px;
-    font-size: 26px;
+/* The actual button — use button tag to avoid base <a> overrides */
+.browse-btn {
+    display: inline-flex !important;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.6rem 1.6rem;
+    border-radius: 8px;
+    font-size: 0.9rem;
     font-weight: 600;
+    text-decoration: none !important;
+    cursor: pointer;
+    width: auto !important;
+    min-width: 0 !important;
+    flex: 0 0 auto;
+    transition: background 0.2s, color 0.2s, transform 0.2s, box-shadow 0.2s;
 }
 
-.section-title.red {
-    color: var(--bms-red); /* BookASeat red */
+.browse-btn-filled {
+    background: var(--bms-red);
+    color: #fff !important;
+    border: 1.5px solid var(--bms-red);
+}
+
+.browse-btn-filled:hover {
+    background: transparent !important;
+    color: var(--bms-red) !important;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(248,68,100,0.3);
+}
+
+.browse-btn-outline {
+    background: transparent;
+    color: var(--bms-red) !important;
+    border: 1.5px solid var(--bms-red);
+}
+
+.browse-btn-outline:hover {
+    background: var(--bms-red) !important;
+    color: #fff !important;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(248,68,100,0.3);
 }
 </style>
 {% endblock %}
-
 
 {% block content %}
 <div class="container my-bookings-page">
 
     <h1 class="page-title">My Bookings</h1>
 
-    <!-- ================= Movie Bookings ================= -->
-    {% if movie_bookings %}
-    <h2 class="section-title red">Movie Bookings</h2>
+    {% if not movie_bookings and not event_bookings %}
+    <!-- No bookings at all -->
+    <div class="full-empty">
+        <i class="bi bi-ticket-perforated"></i>
+        <p>You haven't made any bookings yet.</p>
+        <div class="browse-btn-row">
+            <a href="{% url 'movie_list' %}" class="browse-btn browse-btn-filled">
+                <i class="bi bi-film"></i> Browse Movies
+            </a>
+            <a href="{% url 'event_list' %}" class="browse-btn browse-btn-outline">
+                <i class="bi bi-calendar-event"></i> Browse Events
+            </a>
+        </div>
+    </div>
 
+    {% else %}
+
+    <!-- Movie Bookings -->
+    <h2 class="section-title red">Movie Bookings</h2>
+    {% if movie_bookings %}
     <div class="table-card">
         <table class="booking-table">
             <thead>
@@ -103,26 +160,31 @@
                     <td>{{ booking.show.movie.language }}</td>
                     <td>
                         {% for seat in booking.seats.all %}
-                            {{ seat.row }}{{ seat.seat_number }}
+                            {{ seat.row }}{{ seat.seat_number }}{% if not forloop.last %} {% endif %}
                         {% endfor %}
                     </td>
-                    <td>{{ booking.show.date }}</td>
-                    <td>
-                        <span class="status-pill confirmed">
-                            {{ booking.status }}
-                        </span>
-                    </td>
+                    <td>{{ booking.show.show_date }}</td>
+                    <td><span class="status-pill confirmed">{{ booking.status }}</span></td>
                 </tr>
                 {% endfor %}
             </tbody>
         </table>
     </div>
+    {% else %}
+    <div class="empty-state">
+        <i class="bi bi-film"></i>
+        <p>You haven't booked any movies yet.</p>
+        <div class="browse-btn-row">
+            <a href="{% url 'movie_list' %}" class="browse-btn browse-btn-filled">
+                <i class="bi bi-film"></i> Browse Movies
+            </a>
+        </div>
+    </div>
     {% endif %}
 
-    <!-- ================= Event Bookings ================= -->
+    <!-- Event Bookings -->
+    <h2 class="section-title red" style="margin-top:40px;">Event Bookings</h2>
     {% if event_bookings %}
-    <h2 class="section-title red">Event Bookings</h2>
-
     <div class="table-card">
         <table class="booking-table">
             <thead>
@@ -146,16 +208,24 @@
                     <td>{{ booking.event.get_event_type_display }}</td>
                     <td>{{ booking.quantity }}</td>
                     <td>{{ booking.event.event_date }}</td>
-                    <td>
-                        <span class="status-pill confirmed">
-                            {{ booking.status }}
-                        </span>
-                    </td>
+                    <td><span class="status-pill confirmed">{{ booking.status }}</span></td>
                 </tr>
                 {% endfor %}
             </tbody>
         </table>
     </div>
+    {% else %}
+    <div class="empty-state">
+        <i class="bi bi-calendar-event"></i>
+        <p>You haven't booked any events yet.</p>
+        <div class="browse-btn-row">
+            <a href="{% url 'event_list' %}" class="browse-btn browse-btn-filled">
+                <i class="bi bi-calendar-event"></i> Browse Events
+            </a>
+        </div>
+    </div>
+    {% endif %}
+
     {% endif %}
 
 </div>
