@@ -1,27 +1,33 @@
 <nav class="bms-navbar navbar navbar-expand-lg">
   <div class="container">
+
+    <!-- Brand -->
     <a class="bms-brand navbar-brand" href="{% url 'movie_list' %}">
       BOOK<span>A</span>SEAT
     </a>
 
+    <!-- Mobile toggle -->
     <button class="navbar-toggler border-0 shadow-none" type="button"
-            data-bs-toggle="collapse" data-bs-target="#navbarNav"
-            style="color: var(--bms-text);">
-      <i class="bi bi-list" style="font-size:1.5rem;"></i>
+            data-bs-toggle="collapse" data-bs-target="#navbarNav">
+      <i class="bi bi-list" style="font-size:1.5rem; color:var(--bms-text);"></i>
     </button>
 
     <div class="collapse navbar-collapse" id="navbarNav">
       <ul class="navbar-nav ms-auto align-items-lg-center gap-1">
+
+        <!-- Common links -->
         <li class="nav-item">
           <a class="nav-link-bms nav-link" href="{% url 'movie_list' %}">
             <i class="bi bi-house me-1"></i>Home
           </a>
         </li>
+
         <li class="nav-item">
           <a class="nav-link-bms nav-link" href="{% url 'event_list' %}">
             <i class="bi bi-calendar-event me-1"></i>Events
           </a>
         </li>
+
         <li class="nav-item">
           <a class="nav-link-bms nav-link" href="{% url 'my_bookings' %}">
             <i class="bi bi-ticket-perforated me-1"></i>My Bookings
@@ -29,47 +35,93 @@
         </li>
 
         {% if user.is_authenticated %}
+
           {% if user.is_staff %}
-            <!-- Admin: show Admin link only -->
+            <!-- Admin -->
             <li class="nav-item">
-              <a class="nav-link-bms nav-link" href="{% url 'dashboard_home' %}" style="color:#fbbf24 !important;">
+              <a class="nav-link-bms nav-link"
+                 href="{% url 'dashboard_home' %}"
+                 style="color:#fbbf24 !important;">
                 <i class="bi bi-speedometer2 me-1"></i>Admin
               </a>
             </li>
           {% else %}
-            <!-- Normal user: profile icon links to profile page -->
+            <!-- Normal user -->
             <li class="nav-item">
-              <a class="nav-link-bms nav-link" href="{% url 'profile' %}" style="color:var(--bms-text);">
+              <a class="nav-link-bms nav-link" href="{% url 'profile' %}">
                 <i class="bi bi-person-circle me-1"></i>{{ user.username }}
               </a>
             </li>
           {% endif %}
 
-          <li class="nav-item">
-            <form method="post" action="{% url 'logout' %}" style="display:inline;">
-              {% csrf_token %}
-              <button type="submit" class="btn-navbar-cta nav-link"
-                      style="background:none; border:none; cursor:pointer;"
-                      onclick="return confirm('Are you sure you want to logout?')">
-                <i class="bi bi-box-arrow-right me-1"></i>Logout
-              </button>
-            </form>
+          <!-- Logout button (opens modal ONLY) -->
+          <li class="nav-item ms-lg-2">
+            <button type="button"
+                    class="btn-navbar-cta nav-link"
+                    style="background:none; border:none; cursor:pointer;"
+                    data-bs-toggle="modal"
+                    data-bs-target="#logoutModal">
+              <i class="bi bi-box-arrow-right me-1"></i>Logout
+            </button>
           </li>
 
         {% else %}
+
+          <!-- Guest -->
           <li class="nav-item">
             <a class="nav-link-bms nav-link" href="{% url 'register' %}">
               <i class="bi bi-person-plus me-1"></i>Register
             </a>
           </li>
+
           <li class="nav-item ms-lg-2">
             <a class="btn-navbar-cta nav-link" href="{% url 'login' %}">
               <i class="bi bi-box-arrow-in-right me-1"></i>Login
             </a>
           </li>
+
         {% endif %}
 
       </ul>
     </div>
   </div>
 </nav>
+
+<!-- ================= Logout Confirmation Modal ================= -->
+<div class="modal fade" id="logoutModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content bg-dark text-light border-0 rounded-3">
+
+      <div class="modal-header border-0">
+        <h5 class="modal-title">
+          <i class="bi bi-box-arrow-right me-2 text-danger"></i>
+          Confirm Logout
+        </h5>
+        <button type="button"
+                class="btn-close btn-close-white"
+                data-bs-dismiss="modal"></button>
+      </div>
+
+      <div class="modal-body">
+        Are you sure you want to logout from <strong>BookASeat</strong>?
+      </div>
+
+      <div class="modal-footer border-0">
+        <button type="button"
+                class="btn btn-secondary"
+                data-bs-dismiss="modal">
+          Cancel
+        </button>
+
+        <!-- ONLY logout form -->
+        <form method="post" action="{% url 'logout' %}">
+          {% csrf_token %}
+          <button type="submit" class="btn btn-danger">
+            Yes, Logout
+          </button>
+        </form>
+      </div>
+
+    </div>
+  </div>
+</div>
