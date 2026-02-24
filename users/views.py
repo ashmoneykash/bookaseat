@@ -3,6 +3,8 @@ from django.contrib.auth.forms import UserCreationForm, PasswordChangeForm
 from django.contrib.auth import login, update_session_auth_hash
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
+from django.contrib.auth.models import User
+
 from .models import Profile
 
 
@@ -12,9 +14,26 @@ def register(request):
 
     if request.method == 'POST':
         form = UserCreationForm(request.POST)
+
         if form.is_valid():
-            user = form.save()
+            email = request.POST.get('email', '').strip()
+
+            # ── Prevent duplicate email ──
+            if User.objects.filter(email=email).exists():
+                messages.error(request, 'Email is already registered.')
+                return redirect('register')
+
+            user = form.save(commit=False)
+            user.email = email          # ✅ SAVE EMAIL
+            user.save()
+
+            # Auto-login after registration
             login(request, user)
+
+            messages.success(
+                request,
+                'Account created successfully! You can now book tickets.'
+            )
             return redirect('movie_list')
     else:
         form = UserCreationForm()

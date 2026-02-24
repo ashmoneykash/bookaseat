@@ -138,3 +138,14 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = '/'
+
+# EMAIL CONFIGURATION
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+
+EMAIL_HOST_USER = 'solevibe0@gmail.com'   # ← your Gmail
+EMAIL_HOST_PASSWORD = 'wiramnjxbfeosgnz' # ← app password (no spaces)
+
+DEFAULT_FROM_EMAIL = 'BookASeat <solevibe0@gmail.com>'
